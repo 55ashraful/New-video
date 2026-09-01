@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ভাইরাল ভিডিও পোর্টালে স্বাগতম</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background-color: #121212; color: #fff; padding-bottom: 90px; }
+
+    header { background: #1e1e1e; padding: 15px; text-align: center; border-bottom: 2px solid #ff4757; }
+    h1 { color: #ff4757; font-size: 22px; margin-bottom: 10px; }
+    .ad-container { width: 100%; display: flex; justify-content: center; align-items: center; margin: 10px 0; overflow: hidden; min-height: 60px; }
+
+    .category-bar { display: flex; gap: 8px; overflow-x: auto; padding: 10px 15px; background: #181818; }
+    .cat-btn { background: #2a2a2a; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; cursor: pointer; white-space: nowrap; }
+    .cat-btn.active { background: #ff4757; font-weight: bold; }
+
+    .container { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+    .video-card { background: #1e1e1e; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.3); }
+    .video-card video { width: 100%; height: 180px; object-fit: cover; background: #000; display: block; }
+    .video-details { padding: 12px; }
+    .video-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+    .video-cat { font-size: 11px; background: #333; color: #ff7f50; padding: 3px 8px; border-radius: 4px; display: inline-block; }
+
+    .bottom-ad-fixed { position: fixed; bottom: 0; left: 0; width: 100%; background: #1e1e1e; z-index: 999; text-align: center; border-top: 1px solid #333; }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC3tgTH-Cp16LrJzAjgisfgvBTibRF0T4g",
+      authDomain: "studio-ar1ak.firebaseapp.com",
+      databaseURL: "https://studio-ar1ak-default-rtdb.firebaseio.com",
+      projectId: "studio-ar1ak",
+      storageBucket: "studio-ar1ak.firebasestorage.app",
+      messagingSenderId: "77389723660",
+      appId: "1:77389723660:web:2e35437b147041db02d629"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    let adUrlData = "";
+    let adInterval = 15;
+    let allVideos = {};
+    let selectedCat = "সব";
+
+    // সেটিং লোড
+    onValue(ref(db, 'settings/adConfig'), (snapshot) => {
+      const config = snapshot.val();
+      if (config) {
+        adUrlData = config.adUrl || "";
+        adInterval = parseInt(config.adInterval) || 15;
+
+        if (config.topBannerCode) renderAnyAd('topAdBox', config.topBannerCode);
+        if (config.bottomBannerCode) renderAnyAd('bottomAdBox', config.bottomBannerCode);
+      }
+    });
+
+    // যেকোনো প্রকার অ্যাড (Script / URL / HTML) রেন্ডার করার ইউনিভার্সাল ফাংশন
+    function renderAnyAd(containerId, rawCode) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      if (!rawCode) return;
+
+      // যদি সাধারণ Direct URL দেওয়া হয়
+      if (rawCode.startsWith("http://") || rawCode.startsWith("https://")) {
+        const a = document.createElement('a');
+        a.href = rawCode;
+        a.target = "_blank";
+        a.innerHTML = "<span style='color:#ff7f50; font-size:13px;'>👉 এখানে ক্লিক করে বিজ্ঞাপন দেখুন</span>";
+        container.appendChild(a);
+      } else {
+        // Script বা HTML Code হলে iframe-এর ভেতরে সেফভাবে এক্সিকিউট করা হবে
+        const iframe = document.createElement('iframe');
+        iframe.style.border = 'none';
+        iframe.style.width = '100%';
+        iframe.style.height = '75px';
+        iframe.style.overflow = 'hidden';
+        container.appendChild(iframe);
+
+        const doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write(`
+          <html>
+            <body style="margin:0; padding:0; display:flex; justify-content:center; align-items:center; background:transparent;">
+              ${rawCode}
+            </body>
+          </html>
+        `);
+        doc.close();
+      }
+    }
+
+    // ফায়ারবেস ভিডিও লোড
+    onValue(ref(db, 'videos'), (snapshot) => {
+      allVideos = snapshot.val() || {};
+      renderVideos();
+    });
+
+    window.filterVideos = (category) => {
+      selectedCat = category;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText === category);
+      });
+      renderVideos();
+    };
+
+    function renderVideos() {
+      const container = document.getElementById('videoGrid');
+      container.innerHTML = "";
+
+      if (Object.keys(allVideos).length === 0) {
+        container.innerHTML = "<p style='text-align:center; grid-column: 1/-1; color:#aaa;'>কোনো ভিডিও পাওয়া যায়নি!</p>";
+        return;
+      }
+
+      Object.keys(allVideos).reverse().forEach(key => {
+        const item = allVideos[key];
+        const category = item.category || "সাধারণ";
+
+        if (selectedCat === "সব" || category === selectedCat) {
+          const card = document.createElement('div');
+          card.className = 'video-card';
+          card.innerHTML = `
+            <video controls preload="metadata" onplay="handleVideoClick()">
+              <source src="${item.videoUrl}" type="video/mp4">
+            </video>
+            <div class="video-details">
+              <div class="video-title">${item.title}</div>
+              <span class="video-cat">${category}</span>
+            </div>
+          `;
+          container.appendChild(card);
+        }
+      });
+    }
+
+    // Direct Link / Click Ad প্লেয়ার ট্র্রিগার
+    window.handleVideoClick = () => {
+      if (!adUrlData) return;
+
+      const lastClick = localStorage.getItem('lastAdClickTime');
+      const now = Date.now();
+      const intervalMs = adInterval * 60 * 1000;
+
+      if (!lastClick || (now - parseInt(lastClick)) > intervalMs) {
+        localStorage.setItem('lastAdClickTime', now.toString());
+
+        // যদি পুরা script/html বসিয়ে থাকেন তবে সেখান থেকে শুধু URL বের করবে, নতুবা সরাসরি URL এ নিয়ে যাবে
+        let targetUrl = adUrlData;
+        const match = adUrlData.match(/https?:\/\/[^\s"']+/);
+        if (match) targetUrl = match[0];
+
+        window.open(targetUrl, '_blank');
+      }
+    };
+  </script>
+</head>
+<body>
+
+  <header>
+    <h1>🎬 ভাইরাল ভিডিও গ্যালারি</h1>
+    <div id="topAdBox" class="ad-container"></div>
+  </header>
+
+  <div class="category-bar">
+    <button class="cat-btn active" onclick="filterVideos('সব')">সব</button>
+    <button class="cat-btn" onclick="filterVideos('নাটক')">নাটক</button>
+    <button class="cat-btn" onclick="filterVideos('গান')">গান</button>
+    <button class="cat-btn" onclick="filterVideos('শর্টস')">শর্টস</button>
+    <button class="cat-btn" onclick="filterVideos('ফানি')">ফানি</button>
+    <button class="cat-btn" onclick="filterVideos('মুভি')">মুভি</button>
+  </div>
+
+  <div class="container" id="videoGrid">
+    <p style="text-align: center; grid-column: 1/-1;">লোডিং হচ্ছে...</p>
+  </div>
+
+  <div class="bottom-ad-fixed">
+    <div id="bottomAdBox" class="ad-container"></div>
+  </div>
+
+</body>
+</html>
