@@ -25,6 +25,39 @@
 
     body { background-color: #f4f5f8; color: #1a1a1a; padding-bottom: 110px; overflow-x: hidden; }
 
+    /* Preloader CSS Start */
+    #preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background-color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999999;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .preloader-logo {
+      max-width: 200px;
+      width: 100%;
+      height: auto;
+      animation: pulse 1.5s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      100% { transform: scale(1.05); opacity: 1; }
+    }
+
+    .preloader-hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+    /* Preloader CSS End */
+
     /* Header */
     header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #ffffff; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #eaedf1; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
     .logo { font-size: 17px; font-weight: 800; color: #e50914; display: flex; align-items: center; gap: 6px; text-decoration: none; }
@@ -276,6 +309,16 @@
       if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
       if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) { return false; }
     };
+
+    /* Preloader Timer JS */
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        var preloader = document.getElementById('preloader');
+        if (preloader) {
+          preloader.classList.add('preloader-hidden');
+        }
+      }, 5000); // 5 Seconds Delay
+    });
   </script>
 
   <script type="module">
@@ -293,7 +336,6 @@
       onAuthStateChanged 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // আলাদা ফাইল থেকে ডাটাবেজ এবং API Key ইম্পোর্ট করা হলো
     import { firebaseConfig, IMGBB_API_KEY } from './config.js';
 
     const app = initializeApp(firebaseConfig);
@@ -307,6 +349,7 @@
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       updateProfileUI();
+      renderVideos();
     });
 
     let adUrlData = "";
@@ -321,7 +364,6 @@
     let currentTab = "home"; 
     let pinnedVideos = JSON.parse(localStorage.getItem('pinnedVideos') || '[]');
 
-    // ফায়ারবেস থেকে Adsterra এড সেটিংস লোড করা
     onValue(ref(db, 'settings/adConfig'), (snapshot) => {
       const config = snapshot.val();
       if (config) {
@@ -408,14 +450,14 @@
       const allBtn = document.createElement('button');
       allBtn.className = `cat-btn ${selectedCat === 'All' ? 'active' : ''}`;
       allBtn.innerText = "All";
-      allBtn.onclick = () => filterCat('All', allBtn);
+      allBtn.onclick = () => window.filterCat('All', allBtn);
       catBar.appendChild(allBtn);
 
       categoriesList.forEach(catName => {
         const btn = document.createElement('button');
         btn.className = `cat-btn ${selectedCat === catName ? 'active' : ''}`;
         btn.innerText = catName;
-        btn.onclick = () => filterCat(catName, btn);
+        btn.onclick = () => window.filterCat(catName, btn);
         catBar.appendChild(btn);
       });
     }
@@ -429,9 +471,11 @@
 
     onValue(ref(db, 'heroBanners'), (snapshot) => {
       const heroSlider = document.getElementById('heroSlider');
+      if (!heroSlider) return;
       heroSlider.innerHTML = "";
       const data = snapshot.val();
       if (data) {
+        heroSlider.style.display = currentTab === 'home' ? 'flex' : 'none';
         const banners = Object.values(data);
         banners.forEach(b => {
           const div = document.createElement('div');
@@ -440,7 +484,7 @@
           
           div.onclick = () => {
             if (b.videoUrl) {
-              handleNormalVideoClick(b.videoUrl, b.title || 'Banner Video');
+              window.handleNormalVideoClick(b.videoUrl, b.title || 'Banner Video');
             } else if (b.linkUrl) {
               window.open(b.linkUrl, '_blank');
             }
@@ -492,6 +536,7 @@
 
     function renderVideos() {
       const mainContainer = document.getElementById('mainContentContainer');
+      if (!mainContainer) return;
       mainContainer.innerHTML = "";
 
       if (currentTab === "profile") {
@@ -516,7 +561,6 @@
             count++;
             premGrid.appendChild(createCard(key, item, false, true));
             
-            // Native Ad Injection
             if (nativeAdCodeData && (index + 1) % 6 === 0) {
               const nativeBox = document.createElement('div');
               nativeBox.className = 'native-ad-container';
@@ -602,7 +646,6 @@
             const isPinned = pinnedVideos.includes(obj.key);
             grid.appendChild(createCard(obj.key, obj.data, isPinned, false));
 
-            // Native Ad Box in Category List
             if (nativeAdCodeData && (idx + 1) % 6 === 0) {
               const nativeBox = document.createElement('div');
               nativeBox.className = 'native-ad-container';
@@ -650,7 +693,7 @@
         if (isPremium) {
           handlePremiumVideoClick(key, item);
         } else {
-          handleNormalVideoClick(item.videoUrl, item.title, item.adUrl);
+          window.handleNormalVideoClick(item.videoUrl, item.title, item.adUrl);
         }
       };
 
@@ -660,7 +703,7 @@
             <i class="fa-solid ${isUnlocked ? 'fa-unlock' : 'fa-lock'}"></i>
           </div>
         ` : ''}
-        ${!isPremium ? `<div class="pin-btn ${isPinned ? 'pinned' : ''}" onclick="togglePin(event, '${key}')" title="Pin Video"><i class="fa-solid fa-bookmark"></i></div>` : ''}
+        ${!isPremium ? `<div class="pin-btn ${isPinned ? 'pinned' : ''}" onclick="window.togglePin(event, '${key}')" title="Pin Video"><i class="fa-solid fa-bookmark"></i></div>` : ''}
         <video src="${item.videoUrl}#t=1" class="poster-img" preload="metadata" oncontextmenu="return false;"></video>
         <div class="play-overlay"><i class="fa-solid ${isPremium && !isUnlocked ? 'fa-lock' : 'fa-play'}"></i></div>
         <div class="poster-title-overlay">
@@ -670,7 +713,6 @@
       return card;
     }
 
-    // Direct Link Ad handling for normal videos
     window.handleNormalVideoClick = (videoUrl, title, specificAdUrl) => {
       const lastAdTime = localStorage.getItem('lastAdTime') || 0;
       const now = Date.now();
@@ -699,7 +741,7 @@
             অপেক্ষা করুন: <span id="adSecondsLeft">30</span> সেকেন্ড
           </div>
 
-          <button id="adCloseXBtn" class="ad-x-close-btn" style="display:none;" onclick="startNormalVideoAfterAd('${videoUrl}', '${title}')">
+          <button id="adCloseXBtn" class="ad-x-close-btn" style="display:none;" onclick="window.startNormalVideoAfterAd('${videoUrl}', '${title}')">
             ✕ বন্ধ করুন ও ভিডিও দেখুন
           </button>
         `;
@@ -723,19 +765,19 @@
           }
         }, 1000);
       } else {
-        openVideoPlayer(videoUrl, title);
+        window.openVideoPlayer(videoUrl, title);
       }
     };
 
     window.startNormalVideoAfterAd = (videoUrl, title) => {
-      closeLockModal();
-      openVideoPlayer(videoUrl, title);
+      window.closeLockModal();
+      window.openVideoPlayer(videoUrl, title);
     };
 
     function handlePremiumVideoClick(key, item) {
       if (!currentUser) {
         alert("প্রিমিয়াম ভিডিও দেখতে হলে আপনাকে প্রথমে লগইন করতে হবে।");
-        switchTab('profile', document.querySelectorAll('.nav-link')[3]);
+        window.switchTab('profile', document.querySelectorAll('.nav-link')[3]);
         return;
       }
 
@@ -743,9 +785,9 @@
       if (!videoAdProgress[key]) videoAdProgress[key] = 0;
 
       if (videoAdProgress[key] < requiredAds) {
-        openLockModal(key, item, videoAdProgress[key], requiredAds);
+        window.openLockModal(key, item, videoAdProgress[key], requiredAds);
       } else {
-        openVideoPlayer(item.videoUrl, item.title);
+        window.openVideoPlayer(item.videoUrl, item.title);
       }
     }
 
@@ -758,7 +800,7 @@
         <i class="fa-solid fa-lock" style="color:#e50914;"></i>
         <h3>Locked Premium Content</h3>
         <p>ভিডিওটি আনলক করতে আরও <b>${requiredAds - currentCount}</b> টি এড দেখতে হবে। (${currentCount}/${requiredAds})</p>
-        <button class="lock-btn" onclick="watchAdForVideo('${key}', '${item.videoUrl}', '${item.title}', ${requiredAds}, '${item.adUrl || ''}')">Watch Ad</button>
+        <button class="lock-btn" onclick="window.watchAdForVideo('${key}', '${item.videoUrl}', '${item.title}', ${requiredAds}, '${item.adUrl || ''}')">Watch Ad</button>
       `;
       modal.style.display = 'flex';
     };
@@ -782,10 +824,10 @@
         <p style="font-size:11px; color:#aaa;">নতুন ট্যাবে অ্যাড প্লে হচ্ছে। 30 সেকেন্ড পর বন্ধ করুন বাটনটি দৃশ্যমান হবে।</p>
         
         <div id="adTimerBox" class="timer-badge">
-          অ্যাড দেখা শেষ হতে বাকি: <span id="adSecondsLeft">5</span> সেকেন্ড
+          অ্যাড দেখা শেষ হতে বাকি: <span id="adSecondsLeft">30</span> সেকেন্ড
         </div>
 
-        <button id="adCloseXBtn" class="ad-x-close-btn" style="display:none;" onclick="finishAdCount('${key}', '${videoUrl}', '${title}', ${requiredAds})">
+        <button id="adCloseXBtn" class="ad-x-close-btn" style="display:none;" onclick="window.finishAdCount('${key}', '${videoUrl}', '${title}', ${requiredAds})">
           ✕ বন্ধ করুন ও পয়েন্ট নিন
         </button>
       `;
@@ -812,11 +854,11 @@
       videoAdProgress[key] = (videoAdProgress[key] || 0) + 1;
 
       if (videoAdProgress[key] >= requiredAds) {
-        closeLockModal();
+        window.closeLockModal();
         renderVideos();
-        openVideoPlayer(videoUrl, title);
+        window.openVideoPlayer(videoUrl, title);
       } else {
-        openLockModal(key, { videoUrl, title }, videoAdProgress[key], requiredAds);
+        window.openLockModal(key, { videoUrl, title }, videoAdProgress[key], requiredAds);
       }
     };
 
@@ -831,17 +873,17 @@
     window.switchTab = (tabName, navElement) => {
       currentTab = tabName;
       document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-      navElement.classList.add('active');
+      if(navElement) navElement.classList.add('active');
 
       const heroSlider = document.getElementById('heroSlider');
       const catBar = document.getElementById('catBar');
 
       if (tabName === "mylist" || tabName === "trending" || tabName === "profile") {
-        heroSlider.style.display = 'none';
-        catBar.style.display = 'none';
+        if(heroSlider) heroSlider.style.display = 'none';
+        if(catBar) catBar.style.display = 'none';
       } else {
-        heroSlider.style.display = 'flex';
-        catBar.style.display = 'flex';
+        if(heroSlider) heroSlider.style.display = 'flex';
+        if(catBar) catBar.style.display = 'flex';
       }
 
       renderVideos();
@@ -853,7 +895,7 @@
           <div class="profile-card">
             <h3 style="margin-bottom:8px;">Login or Register</h3>
             <p style="font-size:12px; color:#666; margin-bottom:15px;">গুগল অথবা ইমেইল দিয়ে লগইন করে আপনার প্রোফাইল অ্যাক্সেস করুন।</p>
-            <button class="auth-btn btn-google" onclick="loginWithGoogle()">
+            <button class="auth-btn btn-google" onclick="window.loginWithGoogle()">
               <svg class="google-icon" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -875,11 +917,11 @@
             <div class="profile-img-container">
               <img src="${photo}" id="userAvatar" class="profile-img" oncontextmenu="return false;">
               <label for="imgUpload" class="upload-btn"><i class="fa-solid fa-camera"></i></label>
-              <input type="file" id="imgUpload" accept="image/*" style="display:none;" onchange="handleImageUpload(event)">
+              <input type="file" id="imgUpload" accept="image/*" style="display:none;" onchange="window.handleImageUpload(event)">
             </div>
             <div class="profile-name">${currentUser.displayName || 'User'}</div>
             <div class="profile-email">${currentUser.email}</div>
-            <button class="auth-btn btn-danger" onclick="logoutUser()">
+            <button class="auth-btn btn-danger" onclick="window.logoutUser()">
               <i class="fa-solid fa-right-from-bracket"></i> Sign Out
             </button>
           </div>
@@ -889,7 +931,7 @@
 
     function renderLoginForm() {
       return `
-        <form onsubmit="handleEmailLogin(event)" class="auth-form">
+        <form onsubmit="window.handleEmailLogin(event)" class="auth-form">
           <div class="form-group">
             <label>Email Address</label>
             <input type="email" id="loginEmail" required placeholder="Enter your email">
@@ -899,14 +941,14 @@
             <input type="password" id="loginPass" required placeholder="Enter password">
           </div>
           <button type="submit" class="auth-btn btn-primary">Sign In</button>
-          <div class="auth-toggle" onclick="toggleAuthForm('register')">Don't have an account? Register</div>
+          <div class="auth-toggle" onclick="window.toggleAuthForm('register')">Don't have an account? Register</div>
         </form>
       `;
     }
 
     function renderRegisterForm() {
       return `
-        <form onsubmit="handleEmailRegister(event)" class="auth-form">
+        <form onsubmit="window.handleEmailRegister(event)" class="auth-form">
           <div class="form-group">
             <label>Full Name</label>
             <input type="text" id="regName" required placeholder="Enter your name">
@@ -920,13 +962,14 @@
             <input type="password" id="regPass" required placeholder="Create password">
           </div>
           <button type="submit" class="auth-btn btn-primary">Create Account</button>
-          <div class="auth-toggle" onclick="toggleAuthForm('login')">Already have an account? Sign In</div>
+          <div class="auth-toggle" onclick="window.toggleAuthForm('login')">Already have an account? Sign In</div>
         </form>
       `;
     }
 
     window.toggleAuthForm = (type) => {
       const formArea = document.getElementById('authFormArea');
+      if (!formArea) return;
       if (type === 'register') {
         formArea.innerHTML = renderRegisterForm();
       } else {
@@ -953,7 +996,7 @@
         sendEmailVerification(user).then(() => {
           alert("রেজিস্ট্রেশন সফল হয়েছে! ইমেইল ভেরিফাই করুন।");
           signOut(auth);
-          toggleAuthForm('login');
+          window.toggleAuthForm('login');
         });
       }).catch(err => alert(err.message));
     };
@@ -1003,12 +1046,12 @@
     };
 
     function updateProfileUI() {
-      const profileNavBtn = document.getElementById('navProfileIcon');
-      if (profileNavBtn) {
+      const profileNavContainer = document.getElementById('profileNavContainer');
+      if (profileNavContainer) {
         if (currentUser && currentUser.photoURL) {
-          profileNavBtn.outerHTML = `<img src="${currentUser.photoURL}" id="navProfileIcon">`;
+          profileNavContainer.innerHTML = `<img src="${currentUser.photoURL}" id="navProfileIcon">`;
         } else {
-          profileNavBtn.outerHTML = `<i class="fa-solid fa-user" id="navProfileIcon"></i>`;
+          profileNavContainer.innerHTML = `<i class="fa-solid fa-user" id="navProfileIcon"></i>`;
         }
       }
     }
@@ -1060,6 +1103,11 @@
 </head>
 <body oncontextmenu="return false;">
 
+  <!-- Preloader Screen (5 Seconds Logo Display) -->
+  <div id="preloader">
+    <img src="https://i.ibb.co/Gf5TySRg/1000109014.png" alt="Website Logo" class="preloader-logo">
+  </div>
+
   <!-- Dynamic Scripts Container -->
   <div id="popunderAdContainer"></div>
   <div id="socialBarAdContainer"></div>
@@ -1070,7 +1118,7 @@
       <i class="fa-solid fa-circle-play"></i> SECRET<span>VIDEO</span>
     </a>
     <div class="header-icons">
-      <i class="fa-solid fa-magnifying-glass" onclick="toggleSearch()" title="Search Video"></i>
+      <i class="fa-solid fa-magnifying-glass" onclick="window.toggleSearch()" title="Search Video"></i>
       <i class="fa-solid fa-bell"></i>
     </div>
   </header>
@@ -1079,7 +1127,7 @@
   <div class="search-box" id="searchBox">
     <div class="search-input-wrapper">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="searchInput" placeholder="Search videos by title..." oninput="handleSearch(event)">
+      <input type="text" id="searchInput" placeholder="Search videos by title..." oninput="window.handleSearch(event)">
     </div>
   </div>
 
@@ -1097,14 +1145,14 @@
 
   <!-- Player Modal -->
   <div class="player-modal" id="playerModal">
-    <span class="close-modal" onclick="closePlayer()">&times;</span>
+    <span class="close-modal" onclick="window.closePlayer()">&times;</span>
     <div id="videoPlayerContainer" style="width:100%; display:flex; justify-content:center;"></div>
     <div class="modal-title" id="modalTitle"></div>
   </div>
 
   <!-- Dynamic Lock & Timer Modal -->
   <div class="player-modal" id="lockModal">
-    <span class="close-modal" onclick="closeLockModal()">&times;</span>
+    <span class="close-modal" onclick="window.closeLockModal()">&times;</span>
     <div class="lock-box"></div>
   </div>
 
@@ -1113,20 +1161,20 @@
 
   <!-- Bottom Nav -->
   <nav class="bottom-nav">
-    <a onclick="switchTab('home', this)" class="nav-link active">
+    <a onclick="window.switchTab('home', this)" class="nav-link active">
       <i class="fa-solid fa-house"></i>
       <span>Home</span>
     </a>
-    <a onclick="switchTab('trending', this)" class="nav-link">
+    <a onclick="window.switchTab('trending', this)" class="nav-link">
       <i class="fa-solid fa-fire"></i>
       <span>Trending</span>
     </a>
-    <a onclick="switchTab('mylist', this)" class="nav-link">
+    <a onclick="window.switchTab('mylist', this)" class="nav-link">
       <i class="fa-solid fa-bookmark"></i>
       <span>My List</span>
     </a>
-    <a onclick="switchTab('profile', this)" class="nav-link">
-      <i class="fa-solid fa-user" id="navProfileIcon"></i>
+    <a onclick="window.switchTab('profile', this)" class="nav-link">
+      <span id="profileNavContainer"><i class="fa-solid fa-user" id="navProfileIcon"></i></span>
       <span>Profile</span>
     </a>
   </nav>
