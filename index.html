@@ -25,39 +25,6 @@
 
     body { background-color: #f4f5f8; color: #1a1a1a; padding-bottom: 110px; overflow-x: hidden; }
 
-    /* Preloader CSS Start */
-    #preloader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100vh;
-      background-color: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 999999;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
-    }
-
-    .preloader-logo {
-      max-width: 200px;
-      width: 100%;
-      height: auto;
-      animation: pulse 1.5s infinite alternate;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(0.95); opacity: 0.8; }
-      100% { transform: scale(1.05); opacity: 1; }
-    }
-
-    .preloader-hidden {
-      opacity: 0;
-      visibility: hidden;
-    }
-    /* Preloader CSS End */
-
     /* Header */
     header { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: #ffffff; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #eaedf1; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
     .logo { font-size: 17px; font-weight: 800; color: #e50914; display: flex; align-items: center; gap: 6px; text-decoration: none; }
@@ -309,16 +276,6 @@
       if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
       if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) { return false; }
     };
-
-    /* Preloader Timer JS */
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        var preloader = document.getElementById('preloader');
-        if (preloader) {
-          preloader.classList.add('preloader-hidden');
-        }
-      }, 5000); // 5 Seconds Delay
-    });
   </script>
 
   <script type="module">
@@ -1102,11 +1059,6 @@
   </script>
 </head>
 <body oncontextmenu="return false;">
-
-  <!-- Preloader Screen (5 Seconds Logo Display) -->
-  <div id="preloader">
-    <img src="https://i.ibb.co/Gf5TySRg/1000109014.png" alt="Website Logo" class="preloader-logo">
-  </div>
 
   <!-- Dynamic Scripts Container -->
   <div id="popunderAdContainer"></div>
