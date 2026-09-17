@@ -284,8 +284,11 @@
           email: email, code: code, createdAt: Date.now(), verified: false
         });
 
+        /* ✅ EmailJS-এ email এবং to_email উভয় নামেই পাস করা হলো, যাতে এরর না আসে */
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-          to_email: email, passcode: code
+          to_email: email,
+          email: email,
+          passcode: code
         });
 
         document.getElementById('sentToEmail').innerText = email;
