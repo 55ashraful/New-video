@@ -301,13 +301,13 @@
         document.getElementById('codeInput').value = '';
         goPage('codePage');
         startResendCooldown();
-         } catch (e) {
+       } catch (e) {
         console.error("Full Error:", e);
         alert("❌ কোড পাঠানো যায়নি: " + (e.text || e.message || JSON.stringify(e)));
       } finally {
         btn.disabled = false; btn.innerText = "SEND CODE 📧";
       }
-      
+    };
 
     window.verifyEmailCode = async () => {
       const entered = document.getElementById('codeInput').value.trim();
