@@ -474,7 +474,22 @@
     .fab-option.whatsapp { background: #25D366; }
     .fab-option.phone { background: #007bff; }
     .fab-option.email { background: #ff9800; }
-  </style>
+  /* ===== ১৮+ অপশন বক্স ===== */
+#ageAskModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:99999; align-items:center; justify-content:center; padding:20px; }
+.age-ask-box { background:#fff; border-radius:10px; max-width:340px; width:100%; padding:24px 18px; text-align:center; }
+.age-ask-title { color:#333; font-size:18px; font-weight:800; margin-bottom:6px; }
+.age-ask-sub { color:#777; font-size:12px; margin-bottom:18px; line-height:1.6; }
+.age-opt { display:flex; width:100%; border:none; border-radius:5px; overflow:hidden; margin-bottom:10px; cursor:pointer; box-shadow:0 2px 5px rgba(0,0,0,0.2); padding:0; }
+.age-opt:active { transform:scale(0.98); }
+.age-opt-txt { flex:1; padding:14px 8px; color:#fff; font-weight:bold; font-size:15px; }
+.age-opt-arrow { width:44px; color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; }
+.age-opt-yes .age-opt-txt { background:#1272b6; } .age-opt-yes .age-opt-arrow { background:#6aa5cd; }
+.age-opt-no .age-opt-txt { background:#67a44c; } .age-opt-no .age-opt-arrow { background:#8bbd6f; }
+#ageDenyMsg { display:none; position:fixed; inset:0; background:#fff; z-index:99999; text-align:center; padding-top:80px; }
+#ageDenyMsg .ic { font-size:60px; } #ageDenyMsg h2 { color:#e52d21; font-size:24px; margin:12px 0; }
+#ageDenyMsg p { color:#555; font-size:14px; line-height:1.8; margin-bottom:24px; padding:0 20px; }
+#ageDenyMsg button { background:#1272b6; color:#fff; border:none; padding:14px 30px; border-radius:5px; font-size:15px; font-weight:bold; cursor:pointer; }
+</style>
 
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
@@ -1784,10 +1799,7 @@
     });
   })();
 </script>
-1786  </script>
-1787  <!-- ===== ভাসমান কন্টাক্ট বাটন শেষ ===== -->
-
-<!-- ১৮+ অপশন বক্স -->
+  <!-- ১৮+ অপশন বক্স -->
 <div id="ageAskModal">
   <div class="age-ask-box">
     <div class="age-ask-title">👑 Premium Content</div>
@@ -1808,6 +1820,38 @@
   <p>আপনার বয়স ১৮ বছরের নিচে হওয়ায়<br>এই কন্টেন্ট আপনার জন্য প্রযোজ্য নয়।<br><br>নিচের বাটনে ক্লিক করে সাধারণ প্রিমিয়াম দেখুন।</p>
   <button type="button" onclick="ageShowNormalPremium()">👑 সাধারণ Premium দেখুন</button>
 </div>
-<!-- ===== ভাসমান কন্টাক্ট বাটন শেষ ===== -->
+
+<script>
+/* ✅ Premium ক্লিকে ১৮+ যাচাই */
+function getPremiumNavLink() { return document.querySelectorAll('.nav-link')[1]; }
+
+let ageAllowPremiumOnce = false;
+
+document.addEventListener('click', (e) => {
+  if (ageAllowPremiumOnce) return;
+  const pLink = getPremiumNavLink();
+  if (!pLink || !pLink.contains(e.target)) return;
+  e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+  document.getElementById('ageAskModal').style.display = 'flex';
+}, true);
+
+window.ageGoAbove18 = () => {
+  document.getElementById('ageAskModal').style.display = 'none';
+  window.location.href = 'adult-premium.html';
+};
+
+window.ageGoBelow18 = () => {
+  document.getElementById('ageAskModal').style.display = 'none';
+  document.getElementById('ageDenyMsg').style.display = 'block';
+};
+
+window.ageShowNormalPremium = () => {
+  document.getElementById('ageDenyMsg').style.display = 'none';
+  ageAllowPremiumOnce = true;
+  const link = getPremiumNavLink();
+  if (link) link.click();
+  setTimeout(() => { ageAllowPremiumOnce = false; }, 200);
+};
+</script>
 </body>
 </html>
