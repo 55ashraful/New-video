@@ -6,14 +6,14 @@
   <title>Secret Video - Age Verification</title>
   <link rel="icon" type="image/png" href="https://i.ibb.co/zWvmyGPT/1000109018.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- ✅ EmailJS SDK (ইমেইল ভেরিফিকেশন কোড পাঠানোর জন্য) -->
+  <!-- ✅ EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Roboto,sans-serif; }
     body { background:#f4f5f8; padding:20px 24px 40px; }
     .page { display:none; } .page.active { display:block; }
 
-    /* ✅ হেডার + লোগো (Secret Video স্টাইল) */
+    /* ✅ হেডার + লোগো */
     .hdr { display:flex; align-items:center; gap:14px; margin-bottom:30px; }
     .back-btn { width:44px; height:44px; background:#ececec; border:none; border-radius:8px; color:#333; font-size:16px; cursor:pointer; }
     .logo { display:flex; align-items:center; gap:10px; }
@@ -101,7 +101,7 @@
 </head>
 <body>
 
-  <!-- স্ক্রিন ১: অপশন (৩টা বাটন) -->
+  <!-- স্ক্রিন ১: অপশন -->
   <div class="page active" id="optPage">
     <div class="hdr">
       <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
@@ -231,22 +231,18 @@
     import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    /* ⚠️ মূল পেজের ফাইলের নাম (যদি ভিন্ন হয় বদলে দিন) */
     const MAIN_PAGE = 'index.html';
 
-    /* ✅✅✅ এখানে আপনার ১৮+ ভিডিওগুলো বসান — যত খুশি যোগ করুন */
     const MY_18_VIDEOS = [
       { title: "Video 1", url: "এখানে_ভিডিও_লিংক_১" },
       { title: "Video 2", url: "এখানে_ভিডিও_লিংক_২" },
       { title: "Video 3", url: "এখানে_ভিডিও_লিংক_৩" }
     ];
 
-     /* ✅✅✅ EmailJS কনফিগ — আপনার ৩টা ID বসান (emailjs.com থেকে) */
-    const EMAILJS_SERVICE_ID = "service_2ufumql";   /* ← আপনার সার্ভিস আইডি */
-    const EMAILJS_TEMPLATE_ID = "template_r4rq0wa"; /* ← আপনার টেমপ্লেট আইডি */
-    const EMAILJS_PUBLIC_KEY = "ssNaDyRwpbYhBkmRG";      /* ← আপনার পাবলিক কি */
+    const EMAILJS_SERVICE_ID = "service_2ufumql";
+    const EMAILJS_TEMPLATE_ID = "template_r4rq0wa";
+    const EMAILJS_PUBLIC_KEY = "ssNaDyRwpbYhBkmRG";
     
-    /* 🔥 আপনার মূল ওয়েবসাইটের Firebase (অপরিবর্তিত) */
     const firebaseConfig = {
       apiKey: "AIzaSyC3tgTH-Cp16LrJzAjgisfgvBTibRF0T4g",
       authDomain: "studio-ar1ak.firebaseapp.com",
@@ -260,9 +256,8 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    try { emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); } catch(e) {}
+    try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) {}
 
-    /* ===== পেজ সুইচিং ===== */
     window.goPage = (id) => {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById(id).classList.add('active');
@@ -270,7 +265,6 @@
     };
     window.goHome = () => { window.location.href = MAIN_PAGE; };
 
-    /* ===== ✅ ইমেইল ভেরিফিকেশন (Firebase + EmailJS) ===== */
     let currentVerifyId = null;
 
     window.sendCode = async () => {
@@ -283,16 +277,13 @@
       try {
         const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-        /* ডাটাবেস পারমিশনের জন্য Anonymous লগইন */
         if (!auth.currentUser) await signInAnonymously(auth);
 
-        /* ১. আপনার Firebase ডাটাবেসে কোড সেভ */
         currentVerifyId = 'age_' + Date.now() + '_' + Math.floor(Math.random()*9999);
         await set(ref(db, 'accessRequests/' + currentVerifyId), {
           email: email, code: code, createdAt: Date.now(), verified: false
         });
 
-        /* ২. EmailJS দিয়ে ইমেইল পাঠানো */
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
           to_email: email, passcode: code
         });
@@ -315,17 +306,16 @@
       if (!currentVerifyId) return alert("আগে কোড পাঠান!");
 
       try {
-        const snap = await get(ref(db, 'ageVerifications/' + currentVerifyId));
+        const snap = await get(ref(db, 'accessRequests/' + currentVerifyId));
         const data = snap.val();
         if (!data) return alert("ভেরিফিকেশন ডেটা পাওয়া যায়নি! আবার কোড পাঠান।");
 
-        /* ⏰ ১০ মিনিট মেয়াদ */
         if (Date.now() - data.createdAt > 10 * 60 * 1000) {
           return alert("⏰ কোডের মেয়াদ শেষ! আবার পাঠান।");
         }
 
         if (data.code === entered) {
-          await update(ref(db, 'ageVerifications/' + currentVerifyId), { verified: true });
+          await update(ref(db, 'accessRequests/' + currentVerifyId), { verified: true });
           sessionStorage.setItem('ageVerified18', 'yes');
           showGallery();
         } else {
@@ -347,7 +337,6 @@
       }, 1000);
     }
 
-    /* ===== ভিডিও হেল্পার ===== */
     function toEmbed(u) {
       u = String(u).trim();
       let m = u.match(/(?:youtube\.com\/(?:watch\?.*v=|shorts\/|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
@@ -373,7 +362,6 @@
       return '';
     }
 
-    /* ===== গ্যালারি ===== */
     function buildGallery() {
       const grid = document.getElementById('galGrid');
       grid.innerHTML = '';
@@ -400,7 +388,6 @@
       document.getElementById('playerModal').style.display = 'none';
     };
 
-    /* ===== সেলফি ভেরিফিকেশন ===== */
     let camStream = null, camTimers = [];
 
     window.startSelfie = async () => {
@@ -455,7 +442,6 @@
 
     function showGallery() { buildGallery(); goPage('galleryPage'); }
 
-    /* একবার ভেরিফাই হলে সেশনে সরাসরি গ্যালারি */
     if (sessionStorage.getItem('ageVerified18') === 'yes') {
       document.getElementById('optPage').classList.remove('active');
       showGallery();
