@@ -210,11 +210,11 @@
     </div>
   </div>
 
-  <!-- স্ক্রিন ৮: ১৮+ ভিডিও গ্যালারি -->
+  <!-- স্ক্রিন ৮: ১৮+ ভিডিও গ্যালারি (লগআউট বা এক্সিট বাটন সহ) -->
   <div class="page" id="galleryPage">
     <div class="gal-hdr">
       <span class="t"><i class="fa-solid fa-crown"></i> Premium 18+</span>
-      <button type="button" class="x" onclick="goHome()">✕ Close</button>
+      <button type="button" class="x" onclick="handleLogout()">🚪 Logout / Exit</button>
     </div>
     <div class="gal" id="galGrid"></div>
   </div>
@@ -284,7 +284,6 @@
           email: email, code: code, createdAt: Date.now(), verified: false
         });
 
-        /* ✅ EmailJS-এ email এবং to_email উভয় নামেই পাস করা হলো, যাতে এরর না আসে */
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
           to_email: email,
           email: email,
@@ -319,8 +318,7 @@
 
         if (data.code === entered) {
           await update(ref(db, 'accessRequests/' + currentVerifyId), { verified: true });
-          sessionStorage.setItem('ageVerified18', 'yes');
-          showGallery();
+          saveSessionAndOpenGallery();
         } else {
           alert("❌ ভুল কোড! আবার চেষ্টা করুন।");
         }
@@ -437,18 +435,44 @@
         document.getElementById('vSpin').style.display = 'none';
         document.getElementById('vStat').innerHTML = '<div class="vok">✅</div>Verification Successful!';
         setTimeout(() => {
-          sessionStorage.setItem('ageVerified18', 'yes');
-          showGallery();
+          saveSessionAndOpenGallery();
         }, 1400);
       }, 3000);
     }
 
-    function showGallery() { buildGallery(); goPage('galleryPage'); }
-
-    if (sessionStorage.getItem('ageVerified18') === 'yes') {
-      document.getElementById('optPage').classList.remove('active');
-      showGallery();
+    // ✅ ১ ঘণ্টার সেশন সেভ এবং গ্যালারি ওপেন করার ফাংশন
+    function saveSessionAndOpenGallery() {
+      const expiryTime = new Date().getTime() + (60 * 60 * 1000); // বর্তমান সময় থেকে ১ ঘণ্টা (3600000 ms)
+      localStorage.setItem('ageVerified18', 'yes');
+      localStorage.setItem('sessionExpiry', expiryTime);
+      buildGallery();
+      goPage('galleryPage');
     }
+
+    // ✅ লগআউট বা এক্সিট করার ফাংশন (সেশন মুছে ফেলবে)
+    window.handleLogout = () => {
+      localStorage.removeItem('ageVerified18');
+      localStorage.removeItem('sessionExpiry');
+      goHome();
+    };
+
+    // ✅ পেজ লোড হওয়ার সাথে সাথে ১ ঘণ্টা সেশন চেক করা
+    window.onload = function() {
+      const verified = localStorage.getItem('ageVerified18');
+      const expiryTime = localStorage.getItem('sessionExpiry');
+      const currentTime = new Date().getTime();
+
+      // যদি ভেরিফাইড থাকে এবং ১ ঘণ্টার সময়সীমা শেষ না হয়ে থাকে
+      if (verified === 'yes' && expiryTime && currentTime < expiryTime) {
+        document.getElementById('optPage').classList.remove('active');
+        buildGallery();
+        goPage('galleryPage');
+      } else {
+        // মেয়াদ শেষ হলে বা সেশন না থাকলে ক্লিয়ার করে দেব
+        localStorage.removeItem('ageVerified18');
+        localStorage.removeItem('sessionExpiry');
+      }
+    };
   </script>
 </body>
 </html>
