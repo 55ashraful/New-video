@@ -288,7 +288,7 @@
 
         /* ১. আপনার Firebase ডাটাবেসে কোড সেভ */
         currentVerifyId = 'age_' + Date.now() + '_' + Math.floor(Math.random()*9999);
-        await set(ref(db, 'ageVerifications/' + currentVerifyId), {
+        await set(ref(db, 'accessRequests/' + currentVerifyId), {
           email: email, code: code, createdAt: Date.now(), verified: false
         });
 
