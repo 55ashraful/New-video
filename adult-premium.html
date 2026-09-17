@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Content</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Roboto,sans-serif; }
+    body { background:#f4f5f8; padding-bottom:40px; }
+    .page { display:none; } .page.active { display:block; }
+    .hdr { display:flex; align-items:center; gap:14px; margin-bottom:30px; }
+    .back-btn { width:44px; height:44px; background:#ececec; border:none; border-radius:8px; color:#333; font-size:16px; cursor:pointer; }
+    .logo { font-size:34px; font-weight:800; letter-spacing:-1px; }
+    .logo .b { color:#1272b6; } .logo .ar { color:#67a44c; } .logo .g { color:#67a44c; }
+    .ttl { text-align:center; color:#333; font-size:24px; font-weight:600; margin-bottom:8px; }
+    .sub { text-align:center; color:#777; font-size:17px; margin-bottom:28px; }
+    .opt { width:100%; border:none; cursor:pointer; padding:0; display:flex; border-radius:4px; overflow:hidden; margin-bottom:4px; box-shadow:0 2px 6px rgba(0,0,0,0.15); }
+    .opt:active { transform:scale(0.98); }
+    .opt .ic { width:70px; display:flex; align-items:center; justify-content:center; font-size:26px; color:#fff; }
+    .opt .tx { flex:1; padding:16px 10px; text-align:center; }
+    .opt .tx .l1 { font-size:20px; font-weight:700; color:#fff; display:block; }
+    .opt .tx .l2 { font-size:14px; color:rgba(255,255,255,0.95); display:block; margin-top:4px; }
+    .opt .ar { width:54px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px; }
+    .blue .ic, .blue .tx { background:#1272b6; } .blue .ar { background:#6aa5cd; }
+    .green .ic, .green .tx { background:#67a44c; } .green .ar { background:#8bbd6f; }
+    .ordiv { display:flex; align-items:center; gap:14px; margin:24px 0; color:#888; font-size:15px; font-weight:600; }
+    .ordiv::before, .ordiv::after { content:''; flex:1; height:1px; background:#ccc; }
+    .dbl { display:flex; align-items:center; gap:10px; color:#555; font-size:15px; margin-top:14px; }
+    .sttl { text-align:center; color:#2a3b55; font-size:26px; font-weight:800; margin-bottom:22px; }
+    .sline { display:flex; align-items:center; justify-content:center; gap:10px; color:#3d4a5c; font-size:15px; font-weight:700; margin-bottom:12px; }
+    .sline i { color:#2e9e4f; }
+    .illus { width:210px; height:210px; margin:22px auto; border-radius:50%; background:#f28b77; border:6px solid #1b2a4a; display:flex; align-items:center; justify-content:center; font-size:100px; }
+    .terms { display:flex; align-items:center; justify-content:center; gap:10px; margin:16px 0 20px; font-size:13px; color:#333; }
+    .terms input { width:22px; height:22px; accent-color:#1272b6; }
+    .start-btn { width:100%; background:#2e9e4f; color:#fff; border:none; padding:16px; font-size:18px; font-weight:800; border-radius:4px; cursor:pointer; }
+    #camPage { position:fixed; inset:0; background:#000; z-index:100000; display:none; }
+    #camVideo { width:100%; height:100%; object-fit:cover; }
+    .oval { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:72vw; max-width:320px; height:100vw; max-height:440px; border:3px solid rgba(255,255,255,0.9); border-radius:50%; }
+    .cam-x { position:absolute; top:18px; right:18px; width:52px; height:52px; background:#fff; color:#1272b6; border:3px solid #1272b6; border-radius:12px; font-size:22px; font-weight:bold; cursor:pointer; }
+    .cam-msg { position:absolute; bottom:7%; left:50%; transform:translateX(-50%); background:#127287; color:#fff; padding:16px 28px; border-radius:8px; font-size:19px; font-weight:800; }
+    .flash { position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .vwrap { text-align:center; padding-top:90px; }
+    .spin { width:64px; height:64px; border:6px solid #e5e5e5; border-top-color:#1272b6; border-radius:50%; margin:0 auto 24px; animation:sp 1s linear infinite; }
+    @keyframes sp { to { transform:rotate(360deg); } }
+    .vstat { color:#333; font-size:19px; font-weight:700; }
+    .vok { color:#2e9e4f; font-size:60px; margin-bottom:16px; }
+    .dwrap { text-align:center; padding-top:60px; }
+    .dwrap .ic { font-size:64px; margin-bottom:14px; }
+    .dwrap h2 { color:#e52d21; font-size:26px; font-weight:800; margin-bottom:14px; }
+    .dwrap p { color:#555; font-size:16px; line-height:1.9; margin-bottom:30px; padding:0 16px; }
+    .hbtn { width:100%; background:#1272b6; color:#fff; border:none; padding:16px; font-size:16px; font-weight:bold; border-radius:4px; cursor:pointer; }
+
+    /* ✅ ১৮+ ভিডিও গ্যালারি */
+    .gal-hdr { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:12px 16px; border-bottom:1px solid #e5e5e5; position:sticky; top:0; z-index:50; }
+    .gal-hdr .t { font-size:17px; font-weight:800; color:#e52d21; }
+    .gal-hdr .x { background:#e52d21; color:#fff; border:none; padding:8px 14px; border-radius:20px; font-size:12px; font-weight:bold; cursor:pointer; }
+    .gal { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; padding:12px; }
+    .gcard { background:#1e1e1e; border-radius:8px; overflow:hidden; cursor:pointer; position:relative; height:135px; }
+    .gcard:active { transform:scale(0.96); }
+    .gcard img { width:100%; height:100%; object-fit:cover; display:block; }
+    .gcard::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%); }
+    .gcard .t { position:absolute; bottom:6px; left:0; width:100%; text-align:center; color:#fff; font-size:11px; font-weight:600; z-index:2; padding:0 4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .gcard .p { position:absolute; top:40%; left:50%; transform:translate(-50%,-50%); width:28px; height:28px; background:rgba(229,9,20,0.9); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; z-index:2; }
+    #playerModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:2000; flex-direction:column; justify-content:center; align-items:center; }
+    .vbox { position:relative; width:100%; max-width:900px; aspect-ratio:16/9; background:#000; }
+    .vbox iframe, .vbox video { width:100%; height:100%; border:none; }
+    .pl-x { position:absolute; top:15px; right:20px; color:#fff; font-size:28px; cursor:pointer; background:rgba(0,0,0,0.5); width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:5; }
+    .pl-t { margin-top:14px; font-size:15px; font-weight:600; color:#fff; text-align:center; padding:0 15px; }
+  </style>
+</head>
+<body>
+
+  <!-- স্ক্রিন ১: অপশন -->
+  <div class="page active" id="optPage">
+    <div class="hdr">
+      <div class="logo"><span class="b">age</span><span class="ar">»</span><span class="g">go</span></div>
+    </div>
+    <h1 class="ttl">VERIFY YOUR AGE TO CONTINUE</h1>
+    <p class="sub">Safe, secure, and free.</p>
+    <button type="button" class="opt blue" onclick="goPage('selfiePage')">
+      <span class="ic"><i class="fa-solid fa-camera"></i></span>
+      <span class="tx"><span class="l1">Selfie ✅</span><span class="l2">Facial age estimation</span></span>
+      <span class="ar"><i class="fa-solid fa-chevron-right"></i></span>
+    </button>
+    <div class="ordiv">OR</div>
+    <button type="button" class="opt green" onclick="goPage('denyPage')">
+      <span class="ic"><i class="fa-solid fa-user-slash"></i></span>
+      <span class="tx"><span class="l1">আমি ১৮ বছরের নিচে</span><span class="l2">I am under 18 — Exit</span></span>
+      <span class="ar"><i class="fa-solid fa-chevron-right"></i></span>
+    </button>
+    <div class="dbl"><i class="fa-solid fa-check-double"></i> Double Anonymity</div>
+  </div>
+
+  <!-- স্ক্রিন ২: সেলফি নির্দেশনা -->
+  <div class="page" id="selfiePage">
+    <div class="hdr">
+      <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
+      <div class="logo"><span class="b">age</span><span class="ar">»</span><span class="g">go</span></div>
+    </div>
+    <h2 class="sttl">When you start...</h2>
+    <div class="sline"><i class="fa-solid fa-circle-check"></i> Center your face</div>
+    <div class="sline"><i class="fa-solid fa-circle-check"></i> Remove face covering or glasses</div>
+    <div class="sline"><i class="fa-solid fa-circle-check"></i> Make sure your lighting is good</div>
+    <div class="illus">🧑</div>
+    <label class="terms">
+      <input type="checkbox" id="termsChk">
+      <span>Accept <b style="color:#1272b6;">Terms & Conditions</b> and <b style="color:#1272b6;">Privacy Policy</b></span>
+    </label>
+    <button type="button" class="start-btn" onclick="startSelfie()">START SELFIE</button>
+  </div>
+
+  <!-- স্ক্রিন ৩: ক্যামেরা -->
+  <div id="camPage">
+    <video id="camVideo" autoplay playsinline muted></video>
+    <div class="oval"></div>
+    <button type="button" class="cam-x" onclick="closeCamera()">✕</button>
+    <div class="cam-msg" id="camMsg">Center your face</div>
+    <div class="flash" id="camFlash"></div>
+  </div>
+
+  <!-- স্ক্রিন ৪: যাচাই হচ্ছে -->
+  <div class="page" id="verifyPage">
+    <div class="vwrap">
+      <div class="spin" id="vSpin"></div>
+      <div class="vstat" id="vStat">আপনার সেলফি বিশ্লেষণ করা হচ্ছে...</div>
+    </div>
+  </div>
+
+  <!-- স্ক্রিন ৫: ১৮- মেসেজ -->
+  <div class="page" id="denyPage">
+    <div class="dwrap">
+      <div class="ic">🚫</div>
+      <h2>Access Denied!</h2>
+      <p>দুঃখিত! আপনার বয়স ১৮ বছরের নিচে হওয়ায়<br>এই কন্টেন্ট দেখতে পারবেন না।</p>
+      <button type="button" class="hbtn" onclick="goHome()">🔙 হোমে ফিরে যান</button>
+    </div>
+  </div>
+
+  <!-- ✅✅ স্ক্রিন ৬: ১৮+ ভিডিও গ্যালারি (ভেরিফাই হলে দেখাবে) -->
+  <div class="page" id="galleryPage">
+    <div class="gal-hdr">
+      <span class="t"><i class="fa-solid fa-crown"></i> Premium 18+</span>
+      <button type="button" class="x" onclick="goHome()">✕ Close</button>
+    </div>
+    <div class="gal" id="galGrid"></div>
+  </div>
+
+  <!-- ভিডিও প্লেয়ার -->
+  <div id="playerModal">
+    <button type="button" class="pl-x" onclick="closePlayer()">✕</button>
+    <div class="vbox" id="playerBox"></div>
+    <div class="pl-t" id="playerTitle"></div>
+  </div>
+
+  <script>
+    /* ⚠️ মূল পেজের ফাইলের নাম দিন */
+    const MAIN_PAGE = 'index.html';
+
+    /* ✅✅✅ এখানে আপনার ১৮+ ভিডিওগুলো বসান — যত খুশি যোগ করুন */
+    const MY_18_VIDEOS = [
+      { title: "Video 1", url: "এখানে_ভিডিও_লিংক_১" },
+      { title: "Video 2", url: "এখানে_ভিডিও_লিংক_২" },
+      { title: "Video 3", url: "এখানে_ভিডিও_লিংক_৩" }
+    ];
+
+    /* ইউটিউব/ফেসবুক/টিকটক লিংক → embed লিংক */
+    function toEmbed(u) {
+      u = String(u).trim();
+      let m = u.match(/(?:youtube\.com\/(?:watch\?.*v=|shorts\/|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      if (m) return 'https://www.youtube.com/embed/' + m[1] + '?autoplay=1&rel=0';
+      if (u.includes('facebook.com') || u.includes('fb.watch')) {
+        let fm = u.match(/facebook\.com\/watch\/?\?v=(\d+)/) || u.match(/facebook\.com\/[^\/]+\/videos\/(?:[^\/]+\/)?(\d+)/) || u.match(/facebook\.com\/reel\/(\d+)/);
+        const id = fm ? fm[1] : null;
+        return 'https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(id ? 'https://www.facebook.com/watch/?v=' + id : u) + '&show_text=false&autoplay=0';
+      }
+      m = u.match(/tiktok\.com\/(?:@[^\/]+\/)?video\/(\d+)/);
+      if (m) return 'https://www.tiktok.com/embed/v2/' + m[1];
+      m = u.match(/dailymotion\.com\/video\/([a-zA-Z0-9]+)/) || u.match(/dai\.ly\/([a-zA-Z0-9]+)/);
+      if (m) return 'https://www.dailymotion.com/embed/video/' + m[1];
+      m = u.match(/xnxx\.com\/video-([^\/\?\#]+)/);
+      if (m) return 'https://www.xnxx.com/embedframe/' + m[1];
+      return u;
+    }
+
+    /* অটো থাম্বনেইল */
+    function autoThumb(u) {
+      u = String(u).trim();
+      let m = u.match(/(?:youtube\.com\/(?:watch\?.*v=|shorts\/|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      if (m) return 'https://img.youtube.com/vi/' + m[1] + '/hqdefault.jpg';
+      m = u.match(/dailymotion\.com\/video\/([a-zA-Z0-9]+)/);
+      if (m) return 'https://www.dailymotion.com/thumbnail/video/' + m[1];
+      return '';
+    }
+
+    function goPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      window.scrollTo(0, 0);
+    }
+
+    function goHome() { window.location.href = MAIN_PAGE; }
+
+    /* ✅ গ্যালারি বানানো */
+    function buildGallery() {
+      const grid = document.getElementById('galGrid');
+      grid.innerHTML = '';
+      MY_18_VIDEOS.forEach(v => {
+        const thumb = autoThumb(v.url);
+        const card = document.createElement('div');
+        card.className = 'gcard';
+        card.innerHTML = `
+          ${thumb ? `<img src="${thumb}" onerror="this.style.display='none'">` : ''}
+          <div class="p"><i class="fa-solid fa-play"></i></div>
+          <div class="t">${v.title}</div>
+        `;
+        card.onclick = () => openPlayer(v);
+        grid.appendChild(card);
+      });
+    }
+
+    function openPlayer(v) {
+      document.getElementById('playerBox').innerHTML = `<iframe src="${toEmbed(v.url)}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
+      document.getElementById('playerTitle').innerText = v.title;
+      document.getElementById('playerModal').style.display = 'flex';
+    }
+
+    function closePlayer() {
+      document.getElementById('playerBox').innerHTML = '';
+      document.getElementById('playerModal').style.display = 'none';
+    }
+
+    /* ক্যামেরা + ভেরিফিকেশন */
+    let camStream = null, camTimers = [];
+
+    window.startSelfie = async () => {
+      if (!document.getElementById('termsChk').checked) return alert("প্রথমে Terms & Conditions এ টিক দিন!");
+      if (!navigator.mediaDevices) return alert("আপনার ব্রাউজার ক্যামেরা সাপোর্ট করে না!");
+      try {
+        camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'user' }, audio:false });
+        document.getElementById('camVideo').srcObject = camStream;
+        document.getElementById('camPage').style.display = 'block';
+        const msg = document.getElementById('camMsg');
+        msg.innerText = "Center your face";
+        camTimers.push(setTimeout(() => { msg.innerText = "⏳ ছবি তোলা হচ্ছে..."; }, 3000));
+        camTimers.push(setTimeout(capture, 4300));
+      } catch (e) { alert("ক্যামেরা পারমিশন দেওয়া হয়নি!"); }
+    };
+
+    function stopCam() {
+      camTimers.forEach(t => clearTimeout(t)); camTimers = [];
+      if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
+    }
+
+    window.closeCamera = () => {
+      stopCam();
+      document.getElementById('camPage').style.display = 'none';
+      goPage('selfiePage');
+    };
+
+    function capture() {
+      try {
+        const v = document.getElementById('camVideo');
+        const c = document.createElement('canvas');
+        c.width = v.videoWidth || 320; c.height = v.videoHeight || 240;
+        c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+      } catch(e) {}
+      const f = document.getElementById('camFlash');
+      f.style.opacity = '0.9'; setTimeout(() => f.style.opacity = '0', 250);
+      stopCam();
+      setTimeout(showVerify, 350);
+    }
+
+    function showVerify() {
+      goPage('verifyPage');
+      setTimeout(() => {
+        document.getElementById('vSpin').style.display = 'none';
+        document.getElementById('vStat').innerHTML = '<div class="vok">✅</div>Verification Successful!';
+        setTimeout(() => {
+          sessionStorage.setItem('ageVerified18', 'yes');
+          showGallery();
+        }, 1400);
+      }, 3000);
+    }
+
+    function showGallery() {
+      buildGallery();
+      goPage('galleryPage');
+    }
+
+    /* ✅ একবার ভেরিফাই করলে সেশন শেষ না হওয়া পর্যন্ত সরাসরি গ্যালারি */
+    if (sessionStorage.getItem('ageVerified18') === 'yes') {
+      document.getElementById('optPage').classList.remove('active');
+      showGallery();
+    }
+  </script>
+</body>
+</html>
