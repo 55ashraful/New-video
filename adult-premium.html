@@ -81,7 +81,10 @@
 
     /* ✅ ১৮+ ভিডিও গ্যালারি */
     .top-nav { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px 14px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:16px; }
+    
+    /* শুধু সার্চ আইকন এবং লগআউট বাটন রাখার স্টাইল */
     .top-nav .right-icons { display:flex; gap:16px; align-items:center; font-size:18px; color:#333; cursor:pointer; }
+    
     .section-title { font-size:15px; font-weight:700; color:#333; margin:16px 0 12px; display:flex; align-items:center; gap:6px; }
     
     .gal { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
@@ -220,12 +223,12 @@
 
   <!-- স্ক্রিন ৮: ১৮+ ভিডিও গ্যালারি -->
   <div class="page" id="galleryPage">
+    <!-- টপ হেডার (ঘড়ি বা নোটিফিকেশন রিমুভ করে শুধু সার্চ এবং লগআউট রাখা হয়েছে) -->
     <div class="top-nav">
       <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname" style="font-size:20px;">SECRET<span>VIDEO</span></span></div>
       <div class="right-icons">
         <i class="fa-solid fa-magnifying-glass" onclick="alert('Search feature')"></i>
-        <i class="fa-solid fa-bell" onclick="alert('No notifications')"></i>
-        <i class="fa-solid fa-right-from-bracket" style="color:#e50914;" title="Logout" onclick="handleLogout()"></i>
+        <i class="fa-solid fa-right-from-bracket" style="color:#e50914; padding-left: 5px;" title="Logout" onclick="handleLogout()"></i>
       </div>
     </div>
 
@@ -465,8 +468,6 @@
     }
 
     function saveSessionAndOpenGallery() {
-      // ✅ sessionStorage ব্যবহার করা হয়েছে যাতে ব্রাউজার/পেজে সচল থাকলে ভেরিফিকেশন না চায়
-      // আর localStorage-এ ১ ঘণ্টার টাইমস্ট্যাম্প দেওয়া হয়েছে যাতে পেজ থেকে বের হয়ে গেলে ১ ঘণ্টা পর্যন্ত মনে রাখে
       const expiryTime = new Date().getTime() + (60 * 60 * 1000);
       sessionStorage.setItem('activeInPage', 'yes');
       localStorage.setItem('ageVerified18', 'yes');
@@ -490,13 +491,11 @@
       const expiryTime = localStorage.getItem('sessionExpiry');
       const currentTime = new Date().getTime();
 
-      // ১. যদি ইউজার পেজের ভেতরেই থাকে (sessionStorage চেক করবে) অথবা ১ ঘণ্টার মধ্যে ফিরে আসে (localStorage চেক করবে)
       if (activeInPage === 'yes' || (verified === 'yes' && expiryTime && currentTime < expiryTime)) {
         sessionStorage.setItem('activeInPage', 'yes');
         buildGallery();
         goPage('galleryPage');
       } else {
-        // অন্যথায় ভেরিফিকেশন পেজ দেখাবে
         sessionStorage.removeItem('activeInPage');
         localStorage.removeItem('ageVerified18');
         localStorage.removeItem('sessionExpiry');
