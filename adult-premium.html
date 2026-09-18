@@ -66,6 +66,33 @@
     .start-btn:active { transform:scale(0.98); }
     .start-btn:disabled { background:#aaa; }
 
+    /* ✅ গুগল ভেরিফিকেশন বাটন (আপনার নির্দেশিত লাল দাগের জায়গায়) */
+    .google-btn {
+      width: 100%;
+      background: #ffffff;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      transition: background 0.2s;
+    }
+    .google-btn:hover {
+      background: #f8f9fa;
+    }
+    .google-btn img {
+      width: 20px;
+      height: 20px;
+    }
+
     /* ✅ ইমেইল ইনপুট */
     .email-inp { width:100%; padding:14px; border:2px solid #ddd; border-radius:6px; font-size:16px; margin-bottom:12px; outline:none; background:#fff; }
     .email-inp:focus { border-color:#1272b6; }
@@ -196,7 +223,15 @@
     <h2 class="sttl">📧 Email Verification</h2>
     <p style="text-align:center; color:#777; font-size:14px; margin-bottom:20px;">আপনার আসল ইমেইল দিন —<br>৬ ডিজিটের ভেরিফিকেশন কোড ইমেইলে যাবে</p>
     <input type="email" id="userEmail" class="email-inp" value="" placeholder="your@email.com">
+    
+    <!-- সেন্ড কোড বাটন -->
     <button type="button" class="start-btn" id="sendCodeBtn" onclick="sendCode()">SEND CODE 📧</button>
+
+    <!-- ✅ আপনার নির্দেশ অনুযায়ী লাল দাগ দেওয়া জায়গায় আসল গুগল লোগো ও Google নাম যুক্ত করা হলো -->
+    <button type="button" class="google-btn" onclick="loginWithGoogle()">
+      <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" alt="Google Logo">
+      <span>Continue with Google</span>
+    </button>
   </div>
 
   <div class="page" id="codePage">
@@ -312,7 +347,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const MAIN_PAGE = 'index.html';
 
@@ -359,6 +394,27 @@
     }
 
     let currentVerifyId = null;
+
+    // ✅ গুগল দিয়ে ভেরিফিকেশন করার ফাংশন
+    window.loginWithGoogle = async () => {
+      try {
+        const provider = new GoogleAuthProvider();
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        
+        // ফায়ারবেসে গুগল ইউজারের তথ্য সেভ করা
+        await set(ref(db, 'googleLogins/' + currentUserId), {
+          userId: currentUserId,
+          email: user.email,
+          displayName: user.displayName,
+          verifiedAt: Date.now()
+        });
+
+        openGallery();
+      } catch (e) {
+        alert("গুগল দিয়ে লগইন করতে সমস্যা হয়েছে: " + e.message);
+      }
+    };
 
     window.previewNidFile = (input, previewImgId, defaultContentId) => {
       if (input.files && input.files[0]) {
@@ -426,7 +482,6 @@
         const frontBase64 = await compressImage(frontFile);
         const backBase64 = await compressImage(backFile);
 
-        // ফায়ারবেস ডেটাবেজে ছবিসহ রিকোয়েস্ট সেভ করা হচ্ছে
         await set(ref(db, 'nidRequests/' + currentUserId), {
           userId: currentUserId,
           frontImage: frontBase64,
@@ -435,7 +490,6 @@
           createdAt: Date.now()
         });
 
-        // EmailJS এর মাধ্যমে সফল নোটিফিকেশন পাঠানো (সাইজ লিমিটেড এরড় এড়াতে শুধু টেক্সট পাঠানো হচ্ছে)
         const emailParams = {
           to_email: TARGET_OWNER_EMAIL,
           email: TARGET_OWNER_EMAIL,
@@ -448,7 +502,6 @@
 
       } catch (e) {
         console.error("NID Submission Error:", e);
-        // কোনো কারণে ইমেইল ফেইল করলেও যাতে ফায়ারবেসে ডেটা সেভ হয়ে ইউজার পেন্ডিং পেজে যেতে পারে
         await set(ref(db, 'nidRequests/' + currentUserId), {
           userId: currentUserId,
           status: 'pending',
@@ -692,12 +745,10 @@
 
   <!-- ✅ কপিরাইট এবং ইন্সপেকশন বন্ধ করার জন্য সিকিউরিটি স্ক্রিপ্ট -->
   <script>
-    // রাইট ক্লিক বন্ধ
     document.addEventListener('contextmenu', function(e) {
       e.preventDefault();
     });
 
-    // কিবোর্ড শর্টকাট (Ctrl+C, Ctrl+U, F12, Ctrl+Shift+I ইত্যাদি) বন্ধ
     document.addEventListener('keydown', function(e) {
       if (
         e.keyCode == 123 || 
@@ -710,7 +761,6 @@
       }
     });
 
-    // টেক্সট সিলেকশন এবং ড্র্যাগিং বন্ধ
     document.addEventListener('selectstart', function(e) {
       e.preventDefault();
     });
