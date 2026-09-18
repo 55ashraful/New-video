@@ -86,12 +86,9 @@
     .vstat { color:#333; font-size:19px; font-weight:700; }
     .vok { color:#2e9e4f; font-size:60px; margin-bottom:16px; }
 
-    /* ✅ ১৮- মেসেজ */
-    .dwrap { text-align:center; padding-top:60px; }
-    .dwrap .ic { font-size:64px; margin-bottom:14px; }
-    .dwrap h2 { color:#e52d21; font-size:26px; font-weight:800; margin-bottom:14px; }
-    .dwrap p { color:#555; font-size:16px; line-height:1.9; margin-bottom:30px; padding:0 16px; }
-    .hbtn { width:100%; background:#1272b6; color:#fff; border:none; padding:16px; font-size:16px; font-weight:bold; border-radius:6px; cursor:pointer; }
+    /* ✅ এনআইডি পেজ স্টাইল */
+    .nid-card-box { background:#fff; padding:16px; border-radius:8px; border:2px dashed #67a44c; text-align:center; margin-bottom:16px; cursor:pointer; }
+    .nid-card-box input { display:none; }
 
     /* ✅ ১৮+ ভিডিও গ্যালারি */
     .top-nav { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px 14px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:16px; }
@@ -130,7 +127,6 @@
       <div class="hdr-left">
         <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
       </div>
-      <!-- মূল পেজে ফেরার কালো, বড় এবং মোটা ক্রস বাটন -->
       <a href="index.html" class="close-btn">✕</a>
     </div>
     <h1 class="ttl">VERIFY YOUR AGE TO CONTINUE</h1>
@@ -152,9 +148,10 @@
 
     <div class="ordiv">OR VERIFY YOUR AGE</div>
 
-    <button type="button" class="opt green" onclick="goPage('denyPage')">
-      <span class="ic"><i class="fa-solid fa-user-slash"></i></span>
-      <span class="tx"><span class="l1">আমি ১৮ বছরের নিচে</span><span class="l2">I am under 18 — Exit</span></span>
+    <!-- ✅ পরিবর্তনকৃত এনআইডি কার্ড ভেরিফিকেশন বাটন -->
+    <button type="button" class="opt green" onclick="goPage('nidPage')">
+      <span class="ic"><i class="fa-solid fa-id-card"></i></span>
+      <span class="tx"><span class="l1">NID Card Verification</span><span class="l2">Upload Original NID Card (18+)</span></span>
       <span class="ar"><i class="fa-solid fa-chevron-right"></i></span>
     </button>
 
@@ -215,6 +212,30 @@
     <button type="button" class="resend-btn" id="resendBtn" onclick="sendCode()">কোড আসেনি? আবার পাঠান</button>
   </div>
 
+  <!-- নতুন স্ক্রিন: এনআইডি কার্ড ভেরিফিকেশন -->
+  <div class="page" id="nidPage">
+    <div class="hdr">
+      <div class="hdr-left">
+        <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      </div>
+      <a href="index.html" class="close-btn">✕</a>
+    </div>
+    <h2 class="sttl">🪪 NID Card Verification</h2>
+    <p style="text-align:center; color:#777; font-size:14px; margin-bottom:16px;">আসল এনআইডি কার্ডের ছবি এবং জন্মতারিখ দিন (বয়স অবশ্যই ১৮ বা তার বেশি হতে হবে)</p>
+    
+    <label class="nid-card-box" onclick="document.getElementById('nidFile').click()">
+      <i class="fa-solid fa-cloud-arrow-up" style="font-size:32px; color:#67a44c; margin-bottom:8px;"></i>
+      <div id="nidFileName" style="font-weight:600; color:#333;">এনআইডি কার্ডের ছবি আপলোড করুন</div>
+      <input type="file" id="nidFile" accept="image/*" onchange="previewNid(this)">
+    </label>
+
+    <label style="font-size:13px; font-weight:700; color:#555; display:block; margin-bottom:6px;">এনআইডি কার্ড অনুযায়ী জন্মতারিখ:</label>
+    <input type="date" id="nidDob" class="email-inp">
+
+    <button type="button" class="start-btn" onclick="verifyNid()">VERIFY NID CARD 🪪</button>
+  </div>
+
   <!-- স্ক্রিন ৫: ক্যামেরা -->
   <div id="camPage">
     <video id="camVideo" autoplay playsinline muted></video>
@@ -228,11 +249,11 @@
   <div class="page" id="verifyPage">
     <div class="vwrap">
       <div class="spin" id="vSpin"></div>
-      <div class="vstat" id="vStat">আপনার সেলফি বিশ্লেষণ করা হচ্ছে...</div>
+      <div class="vstat" id="vStat">আপনার তথ্য যাচাই করা হচ্ছে...</div>
     </div>
   </div>
 
-  <!-- স্ক্রিন ৭: ১৮- মেসেজ -->
+  <!-- স্ক্রিন ৭: ভুল বয়স বা অযোগ্য মেসেজ -->
   <div class="page" id="denyPage">
     <div class="hdr">
       <div class="hdr-left">
@@ -243,9 +264,9 @@
     </div>
     <div class="dwrap">
       <div class="ic">🚫</div>
-      <h2>Access Denied!</h2>
-      <p>দুঃখিত! আপনার বয়স ১৮ বছরের নিচে হওয়ায়<br>এই কন্টেন্ট দেখতে পারবেন না।</p>
-      <button type="button" class="hbtn" onclick="goHome()">🔙 হোমে ফিরে যান</button>
+      <h2>Verification Failed!</h2>
+      <p id="denyReason">দুঃখিত! আপনার বয়স ১৮ বছরের নিচে অথবা এনআইডি তথ্য সঠিক নয়।</p>
+      <button type="button" class="hbtn" onclick="goPage('optPage')">🔄 আবার চেষ্টা করুন</button>
     </div>
   </div>
 
@@ -255,7 +276,6 @@
       <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname" style="font-size:20px;">SECRET<span>VIDEO</span></span></div>
       <div class="right-icons">
         <i class="fa-solid fa-magnifying-glass" onclick="alert('Search feature')"></i>
-        <!-- গ্যালারি পেজেও ডানপাশে ক্রস বাটন ও লগআউট অপশন -->
         <a href="index.html" class="close-btn" style="font-size: 26px;">✕</a>
         <i class="fa-solid fa-right-from-bracket" style="color:#e50914; padding-left: 5px;" title="Logout" onclick="handleLogout()"></i>
       </div>
@@ -265,7 +285,6 @@
     <div class="gal" id="galGrid"></div>
 
     <div class="bot-nav">
-      <!-- হোমে ক্লিক করলে সরাসরি আপনার আসল মূল হোম পেজে (index.html) চলে যাবে -->
       <button class="bot-item" onclick="goHome()"><i class="fa-solid fa-house"></i>Home</button>
       <button class="bot-item active"><i class="fa-solid fa-crown"></i>Premium</button>
       <button class="bot-item" onclick="alert('My List empty')"><i class="fa-solid fa-bookmark"></i>My List</button>
@@ -285,7 +304,7 @@
     import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    const MAIN_PAGE = 'index.html'; // আপনার আসল হোম পেজের ফাইলের নাম এখানে দেওয়া আছে
+    const MAIN_PAGE = 'index.html';
 
     const MY_18_VIDEOS = [
       { title: "Video 1", url: "এখানে_ভিডিও_লিংক_১" },
@@ -323,6 +342,48 @@
     window.goHome = () => { window.location.href = MAIN_PAGE; };
 
     let currentVerifyId = null;
+
+    window.previewNid = (input) => {
+      if (input.files && input.files[0]) {
+        document.getElementById('nidFileName').innerText = "✅ " + input.files[0].name;
+      }
+    };
+
+    window.verifyNid = () => {
+      const fileInput = document.getElementById('nidFile');
+      const dobInput = document.getElementById('nidDob').value;
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        return alert("দয়া করে আসল এনআইডি কার্ডের ছবি আপলোড করুন!");
+      }
+      if (!dobInput) {
+        return alert("দয়া করে এনআইডি কার্ড অনুযায়ী জন্মতারিখ দিন!");
+      }
+
+      // বয়স হিসাব করা (১৮ বছর বা তার বেশি কি না চেক করা)
+      const birthDate = new Date(dobInput);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+
+      if (age < 18) {
+        document.getElementById('denyReason').innerText = `আপনার বয়স ${age} বছর। এনআইডি অনুযায়ী বয়স ১৮ বছরের নিচে হওয়ায় প্রবেশাধিকার নিষিদ্ধ।`;
+        goPage('denyPage');
+        return;
+      }
+
+      goPage('verifyPage');
+      setTimeout(() => {
+        document.getElementById('vSpin').style.display = 'none';
+        document.getElementById('vStat').innerHTML = '<div class="vok">✅</div>NID Verified Successfully!';
+        setTimeout(() => {
+          saveSessionAndOpenGallery();
+        }, 1400);
+      }, 2500);
+    };
 
     window.sendCode = async () => {
       const email = document.getElementById('userEmail').value.trim().toLowerCase();
