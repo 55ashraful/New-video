@@ -233,8 +233,8 @@
     <div class="gal" id="galGrid"></div>
 
     <div class="bot-nav">
-      <!-- হোমে ক্লিক করলে এখন কোনো বাধা ছাড়াই সরাসরি হোম পেজে নিয়ে যাবে -->
-      <button class="bot-item" onclick="goPage('optPage')"><i class="fa-solid fa-house"></i>Home</button>
+      <!-- হোমে ক্লিক করলে সরাসরি আপনার আসল মূল হোম পেজে (index.html) চলে যাবে -->
+      <button class="bot-item" onclick="goHome()"><i class="fa-solid fa-house"></i>Home</button>
       <button class="bot-item active"><i class="fa-solid fa-crown"></i>Premium</button>
       <button class="bot-item" onclick="alert('My List empty')"><i class="fa-solid fa-bookmark"></i>My List</button>
       <button class="bot-item" onclick="alert('Profile tab')"><i class="fa-solid fa-user"></i>Profile</button>
@@ -253,7 +253,7 @@
     import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    const MAIN_PAGE = 'index.html';
+    const MAIN_PAGE = 'index.html'; // আপনার আসল হোম পেজের ফাইলের নাম এখানে দেওয়া আছে
 
     const MY_18_VIDEOS = [
       { title: "Video 1", url: "এখানে_ভিডিও_লিংক_১" },
