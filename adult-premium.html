@@ -346,19 +346,13 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    import { getDatabase, ref, set, get, update, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
     import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
     const MAIN_PAGE = 'index.html';
 
-    const MY_18_VIDEOS = [
-      { title: "Video 1", url: "এখানে_ভিডিও_লিংক_১" },
-      { title: "Video 2", url: "এখানে_ভিডিও_লিংক_২" },
-      { title: "Video 3", url: "এখানে_ভিডিও_লিংক_৩" },
-      { title: "Video 4", url: "এখানে_ভিডিও_লিংক_৪" },
-      { title: "Video 5", url: "এখানে_ভিডিও_লিংক_৫" },
-      { title: "Video 6", url: "এখানে_ভিডিও_লিংক_৬" }
-    ];
+    /* ✅ ভিডিও এখন adult-admin.html প্যানেল থেকে নিয়ন্ত্রণ হবে */
+    let allAdultVideos = [];
 
     const EMAILJS_SERVICE_ID = "service_2ufumql";
     const EMAILJS_TEMPLATE_ID = "template_r4rq0wa";
@@ -380,6 +374,15 @@
 
     try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) {}
 
+    /* ✅ এডমিন প্যানেল থেকে ভিডিও লোড হবে */
+    try { if (!auth.currentUser) await signInAnonymously(auth); } catch(e) {}
+    onValue(ref(db, 'adultVideos'), (snap) => {
+      const data = snap.val() || {};
+      allAdultVideos = Object.keys(data).map(k => ({
+        id: k, title: data[k].title || 'Untitled', url: data[k].url || '', thumb: data[k].thumb || ''
+      }));
+      if (document.getElementById('galleryPage').classList.contains('active')) buildGallery();
+    });
     window.goPage = (id) => {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById(id).classList.add('active');
@@ -644,11 +647,15 @@
       return '';
     }
 
-    function buildGallery() {
+        function buildGallery() {
       const grid = document.getElementById('galGrid');
       grid.innerHTML = '';
-      MY_18_VIDEOS.forEach(v => {
-        const thumb = autoThumb(v.url);
+      if (allAdultVideos.length === 0) {
+        grid.innerHTML = "<p style='color:#888; grid-column:1/-1; text-align:center; padding:20px;'>এখনো কোনো ভিডিও যোগ করা হয়নি</p>";
+        return;
+      }
+      allAdultVideos.forEach(v => {
+        const thumb = v.thumb || autoThumb(v.url);
         const card = document.createElement('div');
         card.className = 'gcard';
         card.innerHTML = `
