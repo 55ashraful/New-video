@@ -396,23 +396,27 @@
     let currentVerifyId = null;
 
     // ✅ গুগল দিয়ে ভেরিফিকেশন করার ফাংশন
-    window.loginWithGoogle = async () => {
+        window.loginWithGoogle = async () => {
       try {
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        
-        // ফায়ারবেসে গুগল ইউজারের তথ্য সেভ করা
-        await set(ref(db, 'googleLogins/' + currentUserId), {
-          userId: currentUserId,
-          email: user.email,
-          displayName: user.displayName,
-          verifiedAt: Date.now()
-        });
+
+        /* ✅ সেভ ব্যর্থ হলেও গ্যালারি খুলবে — Google লগইনই আসল ভেরিফিকেশন */
+        try {
+          await set(ref(db, 'googleLogins/' + currentUserId), {
+            userId: currentUserId,
+            email: user.email,
+            displayName: user.displayName,
+            verifiedAt: Date.now()
+          });
+        } catch (dbErr) {
+          console.warn("DB save skipped:", dbErr.message);
+        }
 
         openGallery();
       } catch (e) {
-        alert("গুগল দিয়ে লগইন করতে সমস্যা হয়েছে: " + e.message);
+        alert("গুগল দিয়ে লগইন করতে সমস্যা হয়েছে: " + e.message);
       }
     };
 
