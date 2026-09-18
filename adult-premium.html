@@ -14,12 +14,26 @@
     .page { display:none; } .page.active { display:block; }
 
     /* ✅ হেডার + লোগো */
-    .hdr { display:flex; align-items:center; gap:14px; margin-bottom:30px; }
+    .hdr { display:flex; align-items:center; justify-content:space-between; margin-bottom:30px; position:relative; }
+    .hdr-left { display:flex; align-items:center; gap:14px; }
     .back-btn { width:44px; height:44px; background:#ececec; border:none; border-radius:8px; color:#333; font-size:16px; cursor:pointer; }
     .logo { display:flex; align-items:center; gap:10px; }
     .logo img { width:46px; height:46px; border-radius:10px; object-fit:cover; box-shadow:0 2px 8px rgba(0,0,0,0.15); }
     .logo .sname { font-size:24px; font-weight:800; color:#e50914; letter-spacing:0.5px; }
     .logo .sname span { color:#fff; background:#e50914; padding:2px 8px; border-radius:4px; font-size:16px; margin-left:4px; }
+
+    /* ✅ কালো, বড় এবং মোটা ক্রস (✕) বাটন স্টাইল */
+    .close-btn {
+      font-size: 28px;
+      font-weight: 900;
+      text-decoration: none;
+      color: #000000;
+      cursor: pointer;
+      padding: 5px 10px;
+    }
+    .close-btn:hover {
+      color: #555555;
+    }
 
     .ttl { text-align:center; color:#333; font-size:24px; font-weight:600; margin-bottom:8px; }
     .sub { text-align:center; color:#777; font-size:17px; margin-bottom:28px; }
@@ -113,7 +127,11 @@
   <!-- স্ক্রিন ১: অপশন -->
   <div class="page active" id="optPage">
     <div class="hdr">
-      <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      <div class="hdr-left">
+        <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      </div>
+      <!-- মূল পেজে ফেরার কালো, বড় এবং মোটা ক্রস বাটন -->
+      <a href="index.html" class="close-btn">✕</a>
     </div>
     <h1 class="ttl">VERIFY YOUR AGE TO CONTINUE</h1>
     <p class="sub">Safe, secure, and free.</p>
@@ -146,8 +164,11 @@
   <!-- স্ক্রিন ২: সেলফি নির্দেশনা -->
   <div class="page" id="selfiePage">
     <div class="hdr">
-      <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
-      <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      <div class="hdr-left">
+        <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      </div>
+      <a href="index.html" class="close-btn">✕</a>
     </div>
     <h2 class="sttl">When you start...</h2>
     <div class="sline"><i class="fa-solid fa-circle-check"></i> Center your face</div>
@@ -164,8 +185,11 @@
   <!-- স্ক্রিন ৩: ইমেইল এন্ট্রি -->
   <div class="page" id="emailPage">
     <div class="hdr">
-      <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
-      <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      <div class="hdr-left">
+        <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      </div>
+      <a href="index.html" class="close-btn">✕</a>
     </div>
     <h2 class="sttl">📧 Email Verification</h2>
     <p style="text-align:center; color:#777; font-size:14px; margin-bottom:20px;">আপনার আসল ইমেইল দিন —<br>৬ ডিজিটের ভেরিফিকেশন কোড ইমেইলে যাবে</p>
@@ -176,8 +200,11 @@
   <!-- স্ক্রিন ৪: কোড এন্ট্রি -->
   <div class="page" id="codePage">
     <div class="hdr">
-      <button type="button" class="back-btn" onclick="goPage('emailPage')"><i class="fa-solid fa-chevron-left"></i></button>
-      <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      <div class="hdr-left">
+        <button type="button" class="back-btn" onclick="goPage('emailPage')"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      </div>
+      <a href="index.html" class="close-btn">✕</a>
     </div>
     <h2 class="sttl">Enter Code</h2>
     <p style="text-align:center; color:#777; font-size:14px; margin-bottom:16px;">
@@ -208,8 +235,11 @@
   <!-- স্ক্রিন ৭: ১৮- মেসেজ -->
   <div class="page" id="denyPage">
     <div class="hdr">
-      <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
-      <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      <div class="hdr-left">
+        <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
+        <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
+      </div>
+      <a href="index.html" class="close-btn">✕</a>
     </div>
     <div class="dwrap">
       <div class="ic">🚫</div>
@@ -225,6 +255,8 @@
       <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname" style="font-size:20px;">SECRET<span>VIDEO</span></span></div>
       <div class="right-icons">
         <i class="fa-solid fa-magnifying-glass" onclick="alert('Search feature')"></i>
+        <!-- গ্যালারি পেজেও ডানপাশে ক্রস বাটন ও লগআউট অপশন -->
+        <a href="index.html" class="close-btn" style="font-size: 26px;">✕</a>
         <i class="fa-solid fa-right-from-bracket" style="color:#e50914; padding-left: 5px;" title="Logout" onclick="handleLogout()"></i>
       </div>
     </div>
