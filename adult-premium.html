@@ -81,8 +81,6 @@
 
     /* ✅ ১৮+ ভিডিও গ্যালারি */
     .top-nav { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px 14px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05); margin-bottom:16px; }
-    
-    /* শুধু সার্চ আইকন এবং লগআউট বাটন রাখার স্টাইল */
     .top-nav .right-icons { display:flex; gap:16px; align-items:center; font-size:18px; color:#333; cursor:pointer; }
     
     .section-title { font-size:15px; font-weight:700; color:#333; margin:16px 0 12px; display:flex; align-items:center; gap:6px; }
@@ -223,7 +221,6 @@
 
   <!-- স্ক্রিন ৮: ১৮+ ভিডিও গ্যালারি -->
   <div class="page" id="galleryPage">
-    <!-- টপ হেডার (ঘড়ি বা নোটিফিকেশন রিমুভ করে শুধু সার্চ এবং লগআউট রাখা হয়েছে) -->
     <div class="top-nav">
       <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname" style="font-size:20px;">SECRET<span>VIDEO</span></span></div>
       <div class="right-icons">
@@ -236,7 +233,8 @@
     <div class="gal" id="galGrid"></div>
 
     <div class="bot-nav">
-      <button class="bot-item" onclick="alert('Home tab')"><i class="fa-solid fa-house"></i>Home</button>
+      <!-- হোমে ক্লিক করলে এখন কোনো বাধা ছাড়াই সরাসরি হোম পেজে নিয়ে যাবে -->
+      <button class="bot-item" onclick="goPage('optPage')"><i class="fa-solid fa-house"></i>Home</button>
       <button class="bot-item active"><i class="fa-solid fa-crown"></i>Premium</button>
       <button class="bot-item" onclick="alert('My List empty')"><i class="fa-solid fa-bookmark"></i>My List</button>
       <button class="bot-item" onclick="alert('Profile tab')"><i class="fa-solid fa-user"></i>Profile</button>
