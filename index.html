@@ -1853,5 +1853,62 @@ window.ageShowNormalPremium = () => {
   setTimeout(() => { ageAllowPremiumOnce = false; }, 200);
 };
 </script>
+  </script>
+  <!-- ১৮+ অপশন বক্স (দুটি বাটনই থাকবে) -->
+<div id="ageAskModal">
+  <div class="age-ask-box">
+    <div class="age-ask-title">👑 Premium Content</div>
+    <div class="age-ask-sub">এই সেকশনে প্রবেশ করতে আপনার বয়স নিশ্চিত করুন</div>
+    
+    <button type="button" class="age-opt age-opt-yes" onclick="ageGoAbove18()">
+      <span class="age-opt-txt">✅ আমি ১৮ বছরের উপরে</span><span class="age-opt-arrow">›</span>
+    </button>
+
+    <!-- নিচের বাটনে ক্লিক করলেও সরাসরি প্রিমিয়াম পেজে চলে যাবে, কোনো মেসেজ আসবে না -->
+    <button type="button" class="age-opt age-opt-no" onclick="ageGoAbove18()">
+      <span class="age-opt-txt">❌ আমি ১৮ বছরের নিচে</span><span class="age-opt-arrow">›</span>
+    </button>
+  </div>
+</div>
+
+<script>
+</script>
+  <!-- ১৮+ অপশন বক্স (দুটি বাটনই থাকবে) -->
+<div id="ageAskModal">
+  <div class="age-ask-box">
+    <div class="age-ask-title">👑 Premium Content</div>
+    <div class="age-ask-sub">এই সেকশনে প্রবেশ করতে আপনার বয়স নিশ্চিত করুন</div>
+    
+    <button type="button" class="age-opt age-opt-yes" onclick="ageGoAbove18()">
+      <span class="age-opt-txt">✅ আমি ১৮ বছরের উপরে</span><span class="age-opt-arrow">›</span>
+    </button>
+
+    <!-- নিচের বাটনে ক্লিক করলেও সরাসরি প্রিমিয়াম পেজে চলে যাবে, কোনো মেসেজ আসবে না -->
+    <button type="button" class="age-opt age-opt-no" onclick="ageGoAbove18()">
+      <span class="age-opt-txt">❌ আমি ১৮ বছরের নিচে</span><span class="age-opt-arrow">›</span>
+    </button>
+  </div>
+</div>
+
+<script>
+/* ✅ Premium ক্লিকে যাচাই পেজে যাওয়া */
+function getPremiumNavLink() { return document.querySelectorAll('.nav-link')[1]; }
+
+let ageAllowPremiumOnce = false;
+
+document.addEventListener('click', (e) => {
+  if (ageAllowPremiumOnce) return;
+  const pLink = getPremiumNavLink();
+  if (!pLink || !pLink.contains(e.target)) return;
+  e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+  document.getElementById('ageAskModal').style.display = 'flex';
+}, true);
+
+// দুটি বাটনেই এখন একই ফাংশন কাজ করবে, ফলে সরাসরি adult-premium.html এ চলে যাবে
+window.ageGoAbove18 = () => {
+  document.getElementById('ageAskModal').style.display = 'none';
+  window.location.href = 'adult-premium.html';
+};
+</script>
 </body>
 </html>
