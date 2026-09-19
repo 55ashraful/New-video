@@ -622,30 +622,56 @@
     }
 
     /* ========================================================
-       ✅ ইউনিভার্সাল ভিডিও ও এমবেড হ্যান্ডলার (যেকোনো সেক্স ভিডিওর লিংক কাজ করবে)
+       ✅ সংশোধিত ইউনিভার্সাল ভিডিও ও এমবেড হ্যান্ডলার
        ======================================================== */
     function toEmbed(u) {
       if (!u) return '';
       u = String(u).trim();
       
-      // ১. যদি সরাসরি HTML <iframe> বা <video> ট্যাগ দেওয়া হয়
+      // ১. সরাসরি HTML <iframe> বা <video> ট্যাগ চেক
       if (u.includes('<iframe') || u.includes('<video')) {
         return u.replace(/width="[^"]*"/g, 'width="100%"').replace(/height="[^"]*"/g, 'height="100%"');
       }
 
-      // ২. YouTube লিঙ্ক চেক
+      let embedUrl = u;
+
+      // ২. Google Drive লিংক হ্যান্ডেল
+      let driveMatch = u.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+      if (driveMatch) {
+        embedUrl = 'https://drive.google.com/file/d/' + driveMatch[1] + '/preview';
+      }
+
+      // ৩. XNXX লিংক হ্যান্ডেল (লিংক বা এমবেড কোডের অংশ থাকলে)
+      if (u.includes('xnxx.com')) {
+        if (u.includes('embedframe/')) {
+          embedUrl = u;
+        } else {
+          let matchId = u.match(/embedframe\/([a-zA-Z0-9_-]+)/) || u.match(/video-([a-zA-Z0-9_-]+)/);
+          if (matchId && matchId[1]) {
+            embedUrl = 'https://www.xnxx.com/embedframe/' + matchId[1];
+          } else {
+            let parts = u.split('/');
+            let videoId = parts.find(p => p.startsWith('u') || p.length > 5) || parts[parts.length - 2];
+            if (videoId) {
+              embedUrl = 'https://www.xnxx.com/embedframe/' + videoId;
+            }
+          }
+        }
+      }
+
+      // ৪. YouTube লিংক চেক
       let ytMatch = u.match(/(?:youtube\.com\/(?:watch\?.*v=|shorts\/|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
       if (ytMatch) {
         return `<iframe src="https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
       }
 
-      // ৩. সরাসরি ভিডিও ফাইল লিঙ্ক (যেমন: .mp4, .webm, ইত্যাদি)
+      // ৫. সরাসরি ভিডিও ফাইল (.mp4) চেক
       if (u.match(/\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i)) {
         return `<video src="${u}" controls autoplay playsinline style="width:100%; height:100%; background:#000;"></video>`;
       }
 
-      // ৪. অন্য যেকোনো থার্ড-পার্টি অ্যাডাল্ট সাইট (যেমন XNXX বা অন্যান্য) URL হলে আইফ্রেম হিসেবে লোড হবে
-      return `<iframe src="${u}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
+      // ফাইনাল আইফ্রেম রিটার্ন
+      return `<iframe src="${embedUrl}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
     }
 
     function autoThumb(u) {
@@ -769,30 +795,17 @@
     };
   </script>
 
-  <!-- ✅ কপিরাইট এবং ইন্সপেকশন বন্ধ করার জন্য সিকিউরিটি স্ক্রিপ্ট -->
+  <!-- ✅ সিকিউরিটি স্ক্রিপ্ট -->
   <script>
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-    });
-
+    document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
     document.addEventListener('keydown', function(e) {
-      if (
-        e.keyCode == 123 || 
-        (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || 
-        (e.ctrlKey && e.keyCode == 85) || 
-        (e.ctrlKey && e.keyCode == 67)
-      ) {
+      if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) || (e.ctrlKey && e.keyCode == 85) || (e.ctrlKey && e.keyCode == 67)) {
         e.preventDefault();
         return false;
       }
     });
-
-    document.addEventListener('selectstart', function(e) {
-      e.preventDefault();
-    });
-    document.addEventListener('dragstart', function(e) {
-      e.preventDefault();
-    });
+    document.addEventListener('selectstart', function(e) { e.preventDefault(); });
+    document.addEventListener('dragstart', function(e) { e.preventDefault(); });
   </script>
 </body>
 </html>
