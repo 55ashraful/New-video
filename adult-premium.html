@@ -66,7 +66,7 @@
     .start-btn:active { transform:scale(0.98); }
     .start-btn:disabled { background:#aaa; }
 
-    /* ✅ গুগল ভেরিফিকেশন বাটন (আপনার নির্দেশিত লাল দাগের জায়গায়) */
+    /* ✅ গুগল ভেরিফিকেশন বাটন */
     .google-btn {
       width: 100%;
       background: #ffffff;
@@ -85,13 +85,8 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       transition: background 0.2s;
     }
-    .google-btn:hover {
-      background: #f8f9fa;
-    }
-    .google-btn img {
-      width: 20px;
-      height: 20px;
-    }
+    .google-btn:hover { background: #f8f9fa; }
+    .google-btn img { width: 20px; height: 20px; }
 
     /* ✅ ইমেইল ইনপুট */
     .email-inp { width:100%; padding:14px; border:2px solid #ddd; border-radius:6px; font-size:16px; margin-bottom:12px; outline:none; background:#fff; }
@@ -224,10 +219,8 @@
     <p style="text-align:center; color:#777; font-size:14px; margin-bottom:20px;">আপনার আসল ইমেইল দিন —<br>৬ ডিজিটের ভেরিফিকেশন কোড ইমেইলে যাবে</p>
     <input type="email" id="userEmail" class="email-inp" value="" placeholder="your@email.com">
     
-    <!-- সেন্ড কোড বাটন -->
     <button type="button" class="start-btn" id="sendCodeBtn" onclick="sendCode()">SEND CODE 📧</button>
 
-    <!-- ✅ আপনার নির্দেশ অনুযায়ী লাল দাগ দেওয়া জায়গায় আসল গুগল লোগো ও Google নাম যুক্ত করা হলো -->
     <button type="button" class="google-btn" onclick="loginWithGoogle()">
       <img src="https://www.gstatic.com/images/branding/product/1x/googleg_48dp.png" alt="Google Logo">
       <span>Continue with Google</span>
@@ -338,9 +331,8 @@
     </div>
   </div>
 
-  <div id="playerModal">
-    <button type="button" class="pl-x" onclick="closePlayer()">✕</button>
-    <div class="vbox" id="playerBox"></div>
+  <div id="playerModal" onclick="closePlayer()">
+    <div class="vbox" id="playerBox" onclick="event.stopPropagation()"></div>
     <div class="pl-t" id="playerTitle"></div>
   </div>
 
@@ -351,7 +343,6 @@
 
     const MAIN_PAGE = 'index.html';
 
-    /* ✅ ভিডিও এখন adult-admin.html প্যানেল থেকে নিয়ন্ত্রণ হবে */
     let allAdultVideos = [];
 
     const EMAILJS_SERVICE_ID = "service_2ufumql";
@@ -374,7 +365,6 @@
 
     try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) {}
 
-    /* ✅ এডমিন প্যানেল থেকে ভিডিও লোড হবে */
     try { if (!auth.currentUser) await signInAnonymously(auth); } catch(e) {}
     onValue(ref(db, 'adultVideos'), (snap) => {
       const data = snap.val() || {};
@@ -398,14 +388,12 @@
 
     let currentVerifyId = null;
 
-    // ✅ গুগল দিয়ে ভেরিফিকেশন করার ফাংশন
-        window.loginWithGoogle = async () => {
+    window.loginWithGoogle = async () => {
       try {
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
 
-        /* ✅ সেভ ব্যর্থ হলেও গ্যালারি খুলবে — Google লগইনই আসল ভেরিফিকেশন */
         try {
           await set(ref(db, 'googleLogins/' + currentUserId), {
             userId: currentUserId,
@@ -633,46 +621,73 @@
       }, 1000);
     }
 
+    /* ========================================================
+       ✅ ইউনিভার্সাল ভিডিও ও এমবেড হ্যান্ডলার (যেকোনো সেক্স ভিডিওর লিংক কাজ করবে)
+       ======================================================== */
     function toEmbed(u) {
+      if (!u) return '';
       u = String(u).trim();
-      let m = u.match(/(?:youtube\.com\/(?:watch\?.*v=|shorts\/|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-      if (m) return 'https://www.youtube.com/embed/' + m[1] + '?autoplay=1&rel=0';
-      return u;
+      
+      // ১. যদি সরাসরি HTML <iframe> বা <video> ট্যাগ দেওয়া হয়
+      if (u.includes('<iframe') || u.includes('<video')) {
+        return u.replace(/width="[^"]*"/g, 'width="100%"').replace(/height="[^"]*"/g, 'height="100%"');
+      }
+
+      // ২. YouTube লিঙ্ক চেক
+      let ytMatch = u.match(/(?:youtube\.com\/(?:watch\?.*v=|shorts\/|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+      if (ytMatch) {
+        return `<iframe src="https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&rel=0" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
+      }
+
+      // ৩. সরাসরি ভিডিও ফাইল লিঙ্ক (যেমন: .mp4, .webm, ইত্যাদি)
+      if (u.match(/\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i)) {
+        return `<video src="${u}" controls autoplay playsinline style="width:100%; height:100%; background:#000;"></video>`;
+      }
+
+      // ৪. অন্য যেকোনো থার্ড-পার্টি অ্যাডাল্ট সাইট (যেমন XNXX বা অন্যান্য) URL হলে আইফ্রেম হিসেবে লোড হবে
+      return `<iframe src="${u}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
     }
 
     function autoThumb(u) {
+      if (!u) return '';
       u = String(u).trim();
       let m = u.match(/(?:youtube\.com\/(?:watch\?.*v=|shorts\/|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
       if (m) return 'https://img.youtube.com/vi/' + m[1] + '/hqdefault.jpg';
-      return '';
+      return ''; 
     }
 
-        function buildGallery() {
+    function buildGallery() {
       const grid = document.getElementById('galGrid');
       grid.innerHTML = '';
-      if (allAdultVideos.length === 0) {
+      
+      if (!allAdultVideos || allAdultVideos.length === 0) {
         grid.innerHTML = "<p style='color:#888; grid-column:1/-1; text-align:center; padding:20px;'>এখনো কোনো ভিডিও যোগ করা হয়নি</p>";
         return;
       }
+
       allAdultVideos.forEach(v => {
         const thumb = v.thumb || autoThumb(v.url);
         const card = document.createElement('div');
         card.className = 'gcard';
+        
         card.innerHTML = `
-          ${thumb ? `<img src="${thumb}" onerror="this.style.display='none'">` : ''}
+          ${thumb ? `<img src="${thumb}" onerror="this.style.display='none'">` : '<div style="width:100%;height:100%;background:#222;display:flex;align-items:center;justify-content:center;color:#fff;"><i class="fa-solid fa-play"></i></div>'}
           <div class="lock-badge"><i class="fa-solid fa-lock" style="font-size:9px;"></i></div>
           <div class="p"><i class="fa-solid fa-play"></i></div>
-          <div class="t">${v.title}</div>`;
+          <div class="t">${v.title || 'Secret Video'}</div>`;
+        
         card.onclick = () => openPlayer(v);
         grid.appendChild(card);
       });
     }
 
     function openPlayer(v) {
-      document.getElementById('playerBox').innerHTML = `<iframe src="${toEmbed(v.url)}" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>`;
-      document.getElementById('playerTitle').innerText = v.title;
+      const playerBox = document.getElementById('playerBox');
+      playerBox.innerHTML = toEmbed(v.url);
+      document.getElementById('playerTitle').innerText = v.title || '';
       document.getElementById('playerModal').style.display = 'flex';
     }
+
     window.closePlayer = () => {
       document.getElementById('playerBox').innerHTML = '';
       document.getElementById('playerModal').style.display = 'none';
