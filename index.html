@@ -474,7 +474,7 @@
     .fab-option.whatsapp { background: #25D366; }
     .fab-option.phone { background: #007bff; }
     .fab-option.email { background: #ff9800; }
-  /* ===== ১৮+ অপশন বক্স ===== */
+ /* ===== ১৮+ অপশন বক্স ===== */
 #ageAskModal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:99999; align-items:center; justify-content:center; padding:20px; }
 .age-ask-box { background:#fff; border-radius:10px; max-width:340px; width:100%; padding:24px 18px; text-align:center; }
 .age-ask-title { color:#333; font-size:18px; font-weight:800; margin-bottom:6px; }
@@ -489,7 +489,7 @@
 #ageDenyMsg .ic { font-size:60px; } #ageDenyMsg h2 { color:#e52d21; font-size:24px; margin:12px 0; }
 #ageDenyMsg p { color:#555; font-size:14px; line-height:1.8; margin-bottom:24px; padding:0 20px; }
 #ageDenyMsg button { background:#1272b6; color:#fff; border:none; padding:14px 30px; border-radius:5px; font-size:15px; font-weight:bold; cursor:pointer; }
-</style>
+ </style>
 
   <script>
     document.addEventListener('contextmenu', event => event.preventDefault());
@@ -1689,6 +1689,7 @@
       videoContainer.innerHTML = "";
       modal.style.display = 'none';
     };
+    window.switchTab = switchTab;
   </script>
 </head>
 <body oncontextmenu="return false;">
@@ -1799,7 +1800,7 @@
     });
   })();
 </script>
-  <!-- ১৮+ অপশন বক্স -->
+<!-- ✅ ১৮+ অপশন বক্স (একটাই) -->
 <div id="ageAskModal">
   <div class="age-ask-box">
     <div class="age-ask-title">👑 Premium Content</div>
@@ -1811,6 +1812,14 @@
       <span class="age-opt-txt">❌ আমি ১৮ বছরের নিচে</span><span class="age-opt-arrow">›</span>
     </button>
   </div>
+</div>
+
+<!-- ১৮- মেসেজ -->
+<div id="ageDenyMsg">
+  <div class="ic">🔞</div>
+  <h2>Sorry!</h2>
+  <p>আপনার বয়স ১৮ বছরের নিচে হওয়ায়<br>এই কন্টেন্ট আপনার জন্য প্রযোজ্য নয়।<br><br>নিচের বাটনে ক্লিক করে সাধারণ প্রিমিয়াম দেখুন।</p>
+  <button type="button" onclick="ageShowNormalPremium()">👑 সাধারণ Premium দেখুন</button>
 </div>
 
 <script>
@@ -1827,79 +1836,32 @@ document.addEventListener('click', (e) => {
   document.getElementById('ageAskModal').style.display = 'flex';
 }, true);
 
+/* ✅ ১৮+ → ভেরিফিকেশন পেজে */
 window.ageGoAbove18 = () => {
   document.getElementById('ageAskModal').style.display = 'none';
   window.location.href = 'adult-premium.html';
 };
 
+/* ✅ ১৮- → Sorry মেসেজ */
 window.ageGoBelow18 = () => {
   document.getElementById('ageAskModal').style.display = 'none';
   document.getElementById('ageDenyMsg').style.display = 'block';
 };
 
+/* ✅ মেসেজের বাটন → মূল সাইটের Premium ভিডিও */
 window.ageShowNormalPremium = () => {
   document.getElementById('ageDenyMsg').style.display = 'none';
+  document.getElementById('ageAskModal').style.display = 'none';
   ageAllowPremiumOnce = true;
   const link = getPremiumNavLink();
-  if (link) link.click();
-  setTimeout(() => { ageAllowPremiumOnce = false; }, 200);
-};
-</script>
-  </script>
-  <!-- ১৮+ অপশন বক্স (দুটি বাটনই থাকবে) -->
-<div id="ageAskModal">
-  <div class="age-ask-box">
-    <div class="age-ask-title">👑 Premium Content</div>
-    <div class="age-ask-sub">এই সেকশনে প্রবেশ করতে আপনার বয়স নিশ্চিত করুন</div>
-    
-    <button type="button" class="age-opt age-opt-yes" onclick="ageGoAbove18()">
-      <span class="age-opt-txt">✅ আমি ১৮ বছরের উপরে</span><span class="age-opt-arrow">›</span>
-    </button>
-
-    <!-- নিচের বাটনে ক্লিক করলেও সরাসরি প্রিমিয়াম পেজে চলে যাবে, কোনো মেসেজ আসবে না -->
-    <button type="button" class="age-opt age-opt-no" onclick="ageGoAbove18()">
-      <span class="age-opt-txt">❌ আমি ১৮ বছরের নিচে</span><span class="age-opt-arrow">›</span>
-    </button>
-  </div>
-</div>
-
-<script>
-</script>
-  <!-- ১৮+ অপশন বক্স (দুটি বাটনই থাকবে) -->
-<div id="ageAskModal">
-  <div class="age-ask-box">
-    <div class="age-ask-title">👑 Premium Content</div>
-    <div class="age-ask-sub">এই সেকশনে প্রবেশ করতে আপনার বয়স নিশ্চিত করুন</div>
-    
-    <button type="button" class="age-opt age-opt-yes" onclick="ageGoAbove18()">
-      <span class="age-opt-txt">✅ আমি ১৮ বছরের উপরে</span><span class="age-opt-arrow">›</span>
-    </button>
-
-    <!-- নিচের বাটনে ক্লিক করলেও সরাসরি প্রিমিয়াম পেজে চলে যাবে, কোনো মেসেজ আসবে না -->
-    <button type="button" class="age-opt age-opt-no" onclick="ageGoAbove18()">
-      <span class="age-opt-txt">❌ আমি ১৮ বছরের নিচে</span><span class="age-opt-arrow">›</span>
-    </button>
-  </div>
-</div>
-
-<script>
-/* ✅ Premium ক্লিকে যাচাই পেজে যাওয়া */
-function getPremiumNavLink() { return document.querySelectorAll('.nav-link')[1]; }
-
-let ageAllowPremiumOnce = false;
-
-document.addEventListener('click', (e) => {
-  if (ageAllowPremiumOnce) return;
-  const pLink = getPremiumNavLink();
-  if (!pLink || !pLink.contains(e.target)) return;
-  e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
-  document.getElementById('ageAskModal').style.display = 'flex';
-}, true);
-
-// দুটি বাটনেই এখন একই ফাংশন কাজ করবে, ফলে সরাসরি adult-premium.html এ চলে যাবে
-window.ageGoAbove18 = () => {
-  document.getElementById('ageAskModal').style.display = 'none';
-  window.location.href = 'adult-premium.html';
+  try {
+    if (window.switchTab && link) {
+      window.switchTab('trending', link);
+    } else if (link) {
+      link.click();
+    }
+  } catch (err) { console.error(err); }
+  setTimeout(() => { ageAllowPremiumOnce = false; }, 1000);
 };
 </script>
 </body>
