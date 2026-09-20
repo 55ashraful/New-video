@@ -360,9 +360,9 @@
     <div class="vwrap" style="padding-top:50px; padding-left:15px; padding-right:15px;">
       <div class="spin" id="pendingSpin"></div>
       <div class="vok" id="statusIcon" style="display:none;">⏳</div>
-      <h2 id="statusTitle" style="color:#333; margin-bottom:10px; font-size:22px;">Secret Video Team এপ্রুভালের অপেক্ষায়</h2>
+      <h2 id="statusTitle" style="color:#333; margin-bottom:10px; font-size:22px;">অ্যাডমিন এপ্রুভালের অপেক্ষায়</h2>
       <p id="statusDesc" style="color:#666; font-size:15px; line-height:1.6; margin-bottom:10px;">
-        আপনার ভেরিফিকেশন সফল হয়েছে! এখন Secret Video Team অনুমতি নিতে হবে।<br>Secret Video Team এপ্রুভ করলেই এই পেজেই ENTER বাটন দেখতে পাবেন।
+        আপনার ভেরিফিকেশন সফল হয়েছে! এখন অ্যাডমিনের অনুমতি নিতে হবে।<br>অ্যাডমিন এপ্রুভ করলেই এই পেজেই ENTER বাটন দেখতে পাবেন।
       </p>
       <p id="pendingMethod" style="color:#1272b6; font-size:13px; font-weight:700; margin-bottom:25px;"></p>
       
@@ -393,7 +393,7 @@
   <div class="page" id="verifyPage">
     <div class="vwrap">
       <div class="spin" id="vSpin"></div>
-      <div class="vstat" id="vStat">Secret Video Team আপনার তথ্য যাচাই করা হচ্ছে...</div>
+      <div class="vstat" id="vStat">আপনার তথ্য যাচাই করা হচ্ছে...</div>
     </div>
   </div>
 
@@ -482,15 +482,15 @@
 
     let currentVerifyId = null;
 
-    /* ✅ Secret Video Team এপ্রুভ করলে অটোমেটিক ধরার জন্য লিসেনার চালু */
+    /* ✅ অ্যাডমিন এপ্রুভ করলে অটোমেটিক ধরার জন্য লিসেনার চালু */
     watchApprovalStatus();
 
     /* ========================================================
-       ✅✅ Secret Video Team এপ্রুভাল সিস্টেম
+       ✅✅ অ্যাডমিন এপ্রুভাল সিস্টেম
        ✅ nidRequests নোড ব্যবহার — যেটা আগে থেকেই কাজ করে
        ======================================================== */
 
-    /* ✅ যেকোনো ভেরিফিকেশনের পর Secret Video Team কাছে রিকুয়েস্ট যাবে */
+    /* ✅ যেকোনো ভেরিফিকেশনের পর অ্যাডমিনের কাছে রিকুয়েস্ট যাবে */
     async function requestAdminAccess(method, extraData = {}) {
       /* আগে থেকেই এপ্রুভ করা থাকলে সরাসরি গ্যালারিতে */
       try {
@@ -519,7 +519,7 @@
         return;
       }
 
-      /* Secret Video Team ইমেইল নোটিফিকেশন (ব্যর্থ হলেও সিস্টেম চলবে) */
+      /* অ্যাডমিনকে ইমেইল নোটিফিকেশন (ব্যর্থ হলেও সিস্টেম চলবে) */
       try {
         await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
           to_email: TARGET_OWNER_EMAIL,
@@ -531,7 +531,7 @@
       showPendingScreen(method);
     }
 
-    /* ✅ Secret Video Team এপ্রুভ/রিজেক্ট করলে অটোমেটিক ধরবে */
+    /* ✅ অ্যাডমিন এপ্রুভ/রিজেক্ট করলে অটোমেটিক ধরবে */
     function watchApprovalStatus() {
       onValue(ref(db, 'nidRequests/' + currentUserId), (snap) => {
         if (!snap.exists()) return;
@@ -547,7 +547,7 @@
           localStorage.removeItem('adminApproved18');
           /* গ্যালারিতে থাকা অবস্থায় রিজেক্ট হলে বের করে দাও */
           if (document.getElementById('galleryPage').classList.contains('active')) {
-            alert("Secret Video Team আপনার এক্সেস রিজেক্ট করেছে।");
+            alert("অ্যাডমিন আপনার এক্সেস রিজেক্ট করেছে।");
             goPage('optPage');
           } else if (document.getElementById('pendingPage').classList.contains('active')) {
             showRejectedOnPending();
@@ -565,8 +565,8 @@
       };
       document.getElementById('pendingSpin').style.display = 'block';
       document.getElementById('statusIcon').style.display = 'none';
-      document.getElementById('statusTitle').innerText = "Secret Video Team এপ্রুভালের অপেক্ষায়";
-      document.getElementById('statusDesc').innerHTML = "আপনার ভেরিফিকেশন সফল হয়েছে! এখন Secret Video Team অনুমতি নিতে হবে।<br>Secret Video Team এপ্রুভ করলেই এই পেজেই ENTER বাটন দেখতে পাবেন।";
+      document.getElementById('statusTitle').innerText = "অ্যাডমিন এপ্রুভালের অপেক্ষায়";
+      document.getElementById('statusDesc').innerHTML = "আপনার ভেরিফিকেশন সফল হয়েছে! এখন অ্যাডমিনের অনুমতি নিতে হবে।<br>অ্যাডমিন এপ্রুভ করলেই এই পেজেই ENTER বাটন দেখতে পাবেন।";
       document.getElementById('pendingMethod').innerText = methodNames[method] || '';
       document.getElementById('enterGalleryBtn').style.display = 'none';
       document.getElementById('retryBtn').style.display = 'none';
@@ -577,7 +577,7 @@
       document.getElementById('pendingSpin').style.display = 'none';
       document.getElementById('statusIcon').innerHTML = '✅';
       document.getElementById('statusIcon').style.display = 'block';
-      document.getElementById('statusTitle').innerText = "অভিনন্দন! Secret Video Team এপ্রুভ করেছে।";
+      document.getElementById('statusTitle').innerText = "অভিনন্দন! অ্যাডমিন এপ্রুভ করেছে।";
       document.getElementById('statusDesc').innerText = "এখন নিচের বাটনে ক্লিক করে সরাসরি ভিডিও দেখতে পারবেন।";
       document.getElementById('enterGalleryBtn').style.display = 'block';
       document.getElementById('retryBtn').style.display = 'none';
@@ -589,7 +589,7 @@
       document.getElementById('statusIcon').innerHTML = '❌';
       document.getElementById('statusIcon').style.display = 'block';
       document.getElementById('statusTitle').innerText = "দুঃখিত! রিকুয়েস্ট রিজেক্ট হয়েছে।";
-      document.getElementById('statusDesc').innerText = "Secret Video Team আপনার রিকুয়েস্ট রিজেক্ট করেছে। আবার ভেরিফিকেশন করতে নিচের বাটনে ক্লিক করুন।";
+      document.getElementById('statusDesc').innerText = "অ্যাডমিন আপনার রিকুয়েস্ট রিজেক্ট করেছে। আবার ভেরিফিকেশন করতে নিচের বাটনে ক্লিক করুন।";
       document.getElementById('enterGalleryBtn').style.display = 'none';
       document.getElementById('retryBtn').style.display = 'block';
       goPage('pendingPage');
@@ -610,7 +610,7 @@
           } else if (data.status === 'rejected') {
             showRejectedOnPending();
           } else {
-            alert("⚠️ আপনার রিকুয়েস্ট এখনো পেন্ডিং (Pending) আছে। Secret Video Team এখনো এপ্রুভ করেনি।");
+            alert("⚠️ আপনার রিকুয়েস্ট এখনো পেন্ডিং (Pending) আছে। অ্যাডমিন এখনো এপ্রুভ করেনি।");
           }
         } else {
           alert("কোনো রিকুয়েস্ট পাওয়া যায়নি। আগে ভেরিফিকেশন করুন।");
@@ -638,7 +638,7 @@
           console.warn("DB save skipped:", dbErr.message);
         }
 
-        /* ✅ গুগল লগইন হলেও Secret Video Team এপ্রুভাল লাগবে */
+        /* ✅ গুগল লগইন হলেও অ্যাডমিন এপ্রুভাল লাগবে */
         await requestAdminAccess('google', { email: user.email || '', name: user.displayName || '' });
       } catch (e) {
         alert("গুগল দিয়ে লগইন করতে সমস্যা হয়েছে: " + e.message);
@@ -711,7 +711,7 @@
         const frontBase64 = await compressImage(frontFile);
         const backBase64 = await compressImage(backFile);
 
-        /* ✅ ছবিসহ Secret Video Team রিকুয়েস্ট */
+        /* ✅ ছবিসহ অ্যাডমিন রিকুয়েস্ট */
         await set(ref(db, 'nidRequests/' + currentUserId), {
           userId: currentUserId,
           method: 'nid',
@@ -750,7 +750,7 @@
       goPage('galleryPage');
     };
 
-    /* ✅ ক্লোজ বাটন: Secret Video Team এপ্রুভ না থাকলে ভেরিফিকেশন পেজে */
+    /* ✅ ক্লোজ বাটন: অ্যাডমিন এপ্রুভ না থাকলে ভেরিফিকেশন পেজে */
     window.closeToVerification = () => {
       if (localStorage.getItem('adminApproved18') === 'yes') {
         buildGallery();
