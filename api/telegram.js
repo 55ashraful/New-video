@@ -1,6 +1,6 @@
 // Vercel serverless Telegram Bot webhook. This file runs server-side, not in the browser.
 // Replace TELEGRAM_BOT_TOKEN below with a freshly rotated token before public deployment.
-const TELEGRAM_BOT_TOKEN = "8530994490:AAGZnVjEg1jIBAN1PvtPXp6by6CwYRvxNLY:";
+const TELEGRAM_BOT_TOKEN = ":";
 const MINI_APP_URL = "https://new-video-hoe4.vercel.app/";
 const BOT_USERNAME = "NewPursonal_bot";
 
