@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Telegram Mini App</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navigation / User Info -->
+        <header class="app-header">
+            <div class="user-profile">
+                <img id="user-avatar" src="assets/images/default-avatar.png" alt="Profile" class="avatar">
+                <div>
+                    <h3 id="user-name">লোড হচ্ছে...</h3>
+                    <p id="user-id">ID: 000000</p>
+                </div>
+            </div>
+            <div class="balance-badge">
+                🪙 <span id="coin-balance">0</span>
+            </div>
+        </header>
+
+        <!-- Top Direct Ad Banner Container -->
+        <div class="ad-card" id="top-ad-banner">
+            <!-- Centralized Top Banner Ad Embed -->
+        </div>
+
+        <!-- Dynamic Main Views -->
+        <main id="app-content" class="main-content">
+            <!-- Home / Tap Game View -->
+            <section id="tab-home" class="tab-view active">
+                <div class="tap-area">
+                    <div class="coin-button" id="tap-btn">
+                        <img src="assets/images/coin-icon.png" alt="Coin" class="coin-img">
+                    </div>
+                </div>
+                <div class="energy-bar-container">
+                    <span id="energy-text">⚡ 100 / 100</span>
+                    <div class="energy-bar-fill" id="energy-fill"></div>
+                </div>
+            </section>
+
+            <!-- Tasks View -->
+            <section id="tab-tasks" class="tab-view hidden">
+                <h2>📋 ডেইলি টাস্ক</h2>
+                <div class="task-list" id="task-container">
+                    <!-- Tasks rendered dynamically -->
+                </div>
+            </section>
+
+            <!-- Mid-Section Ad Banner -->
+            <div class="ad-card" id="mid-ad-banner">
+                <!-- Centralized Mid Ad Embed -->
+            </div>
+
+            <!-- Referrals View -->
+            <section id="tab-referral" class="tab-view hidden">
+                <h2>👥 বন্ধুদের আমন্ত্রণ জানান</h2>
+                <p>প্রতিটি সফল রেফারে ১,০০০ পয়েন্ট বোনাস পান!</p>
+                <div class="ref-link-box">
+                    <input type="text" id="ref-link-input" readonly value="https://t.me/your_bot?start=ref">
+                    <button id="copy-ref-btn">কপি করুন</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Banner Ad Container -->
+        <div class="ad-card sticky-bottom-ad" id="bottom-ad-banner">
+            <!-- Centralized Sticky Bottom Ad Embed -->
+        </div>
+
+        <!-- Navigation Bar -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-tab="home">🏠 হোম</button>
+            <button class="nav-btn" data-tab="tasks">🎯 টাস্ক</button>
+            <button class="nav-btn" data-tab="referral">👥 রেফার</button>
+        </nav>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="js/config.js"></script>
+    <script src="js/telegram.js"></script>
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/modules/ads.js"></script>
+    <script src="js/modules/user.js"></script>
+    <script src="js/modules/tasks.js"></script>
+    <script src="js/modules/reward.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
