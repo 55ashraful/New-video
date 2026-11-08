@@ -51,7 +51,7 @@
 
     function buildVideoShareLink(key) {
       /* শেয়ার লিঙ্ক = টেলিগ্রাম মিনি অ্যাপের সরাসরি ঠিকানা:
-         https://t.me/secret0video_bot/httpstelegramsecretvideoal?startapp=v_<ভিডিও আইডি>
+         https://t.me/secret0video_bot/t.me/premiumsecretvideo_bot/merahaihttpsnewvideoivoryte?startapp=v_<ভিডিও আইডি>
          ঠিকানার /<অ্যাপ-সংক্ষেপ> অংশটা না থাকলে টেলিগ্রাম লিঙ্কটাকে বটের চ্যাট হিসেবে
          খোলে — তাই এই অংশ কখনো বাদ দেওয়া যাবে না। নাম দুটো config.js-এর
          TELEGRAM_SHARE-এ লেখা এবং BotFather-এর অ্যাপ নামের সাথে হুবহু মিলতে হয়। */
