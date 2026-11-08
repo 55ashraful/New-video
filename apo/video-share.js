@@ -9,8 +9,8 @@ const crypto = require('crypto');
 /* প্লে বাটন টেলিগ্রাম মিনি অ্যাপের সরাসরি ঠিকানায় (startapp সহ) নিয়ে যায় —
    অ্যাপের ভেতরে সেই ভিডিওই খুলবে। নাম দুটো config.js-এর TELEGRAM_SHARE-এর
    সাথে হুবহু মিল রাখতে হবে (BotFather-এর অ্যাপ নামও একই)। */
-const SHARE_BOT = 'secret0video_bot';
-const SHARE_APP = 'httpstelegramsecretvideoal';
+const SHARE_BOT = 'premiumsecretvideo_bot';
+const SHARE_APP = 't.me/premiumsecretvideo_bot/merahaihttpsnewvideoivoryte';
 
 function miniAppLink(key) {
   return 'https://t.me/' + SHARE_BOT + '/' + SHARE_APP + '?startapp=v_' + String(key);
