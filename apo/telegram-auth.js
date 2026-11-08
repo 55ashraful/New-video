@@ -30,7 +30,7 @@ module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   try {
-    const token = process.env.TELEGRAM_BOT_TOKEN || '9267247040:AAHcZv7Jvy1JuutWsuNiknZCWwqg4-TNBkk';
+    const token = process.env.TELEGRAM_BOT_TOKEN || '9188761308:AAGjsCjFuQe-qlgq0t3MeDTl5LAHwsLVBRY';
     if (!token) return res.status(500).json({ error: 'TELEGRAM_BOT_TOKEN is not configured in Vercel' });
     const user = verifyTelegramInitData(req.body && req.body.initData, token);
     return res.status(200).json({ verified: true, user: {
