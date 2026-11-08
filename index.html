@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  
+  <title>Secret Video Smoky - Watch & Download Free HD Trending Videos</title>
+  <meta name="description" content="Watch and stream the latest secret trending videos, viral clips, and HD entertainment on Secret Video Smoky Portal. Free and premium video streaming.">
+  <meta name="keywords" content="Secret Video, secret video portal, secret video smoky, free hd videos, trending videos, viral clips">
+  <meta name="robots" content="index, follow">
+  
+
+  <link rel="icon" type="image/png" href="https://i.ibb.co/278M31Tq/1000109014.png">
+  <link rel="apple-touch-icon" href="https://i.ibb.co/278M31Tq/1000109014.png">
+
+  <meta property="og:site_name" content="Secret Video">
+  <meta property="og:title" content="Secret Video - Watch & Download Free HD Trending Videos">
+  <meta property="og:description" content="Watch and stream the latest secret trending videos, viral clips, and HD entertainment on Secret Video Portal for free.">
+  <meta property="og:image" content="https://i.ibb.co/SDTwgBj6/1000109014.png">
+  
+  <meta name="google-site-verification" content="zuwpdVo1tFbmHfLy9DUCvqP6mQVRmZUrPxFAonnnTyU" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+
+  <script>
+    /* শেয়ার করা লিঙ্ক থেকে খুললে সাইটের লোগো (preloader) একবারও না দেখিয়ে
+       সরাসরি ওই ভিডিওর থাম্বনেইল দেখানো। ভিডিওর আইডি URL-এ থাকলেই ধরা হয় —
+       ?v= / ?startapp= / ?tgWebAppStartParam= (টেলিগ্রাম যেভাবেই পাঠাক)। */
+    (function () {
+      var found = false;
+      try {
+        var names = ['v', 'startapp', 'tgWebAppStartParam', 'start_param'];
+        var sources = [new URLSearchParams(window.location.search)];
+        if (window.location.hash && window.location.hash.length > 1) {
+          sources.push(new URLSearchParams(window.location.hash.slice(1)));
+        }
+        found = sources.some(function (p) {
+          return names.some(function (n) { return !!p.get(n); });
+        });
+      } catch (e) {}
+      if (found && document.documentElement) {
+        document.documentElement.className += ' deeplink-open';
+      }
+    })();
+  </script>
+
+  <script>
+    document.addEventListener('contextmenu', event => event.preventDefault());
+    document.onkeydown = function (e) {
+      if (e.keyCode == 123) { return false; }
+      if (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) { return false; }
+      if (e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) { return false; }
+      if (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) { return false; }
+      if (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) { return false; }
+      if (e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) { return false; }
+    };
+
+    document.addEventListener('wheel', function(e){ if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+    document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
+    document.addEventListener('gesturechange', function(e){ e.preventDefault(); });
+    document.addEventListener('touchmove', function(e){ if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+    var __lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e){
+      var now = Date.now();
+      if (now - __lastTouchEnd <= 300) e.preventDefault();
+      __lastTouchEnd = now;
+    }, false);
+
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        var preloader = document.getElementById('preloader');
+        if (preloader) {
+          preloader.classList.add('preloader-hidden');
+        }
+      }, 2500); 
+    });
+  </script>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body oncontextmenu="return false;">
+
+  <!-- Preloader Screen -->
+  <div id="preloader">
+    <img src="https://i.ibb.co/Gf5TySRg/1000109014.png" alt="Website Logo" class="preloader-logo">
+    <div class="preloader-title">
+      <i class="fa-solid fa-circle-play"></i> SECRET<span>VIDEO</span>
+    </div>
+  </div>
+
+  <!-- Dynamic Ad Scripts Container -->
+  <div id="popunderAdContainer"></div>
+  <div id="socialBarAdContainer"></div>
+
+  <!-- Header -->
+  <header>
+    <a href="#" class="logo">
+      <i class="fa-solid fa-circle-play"></i> SECRET<span>VIDEO</span>
+    </a>
+    <div class="header-icons">
+      <i class="fa-solid fa-magnifying-glass" onclick="toggleSearch()" title="Search Video"></i>
+      <i class="fa-solid fa-bell"></i>
+    </div>
+  </header>
+
+  <!-- Search Bar -->
+  <div class="search-box" id="searchBox">
+    <div class="search-input-wrapper">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="Search videos..." oninput="handleSearch(event)">
+    </div>
+  </div>
+
+  <!-- Top Ad Box -->
+  <div class="ad-container" id="topAdBox"></div>
+
+  <!-- Hero Banner Slider -->
+  <div class="hero-slider-wrapper" id="heroSlider"></div>
+
+  <!-- Category Filter Bar -->
+  <div class="cat-bar" id="catBar"></div>
+
+  <!-- ৩০০+/২০০+ ভিডিও কাউন্ট বার -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-item">🎬 নরমাল ভিডিও: <b id="normalVideoCount">300</b>+</div>
+    <div class="stat-item">👑 প্রিমিয়াম ভিডিও: <b id="premiumVideoCount">200</b>+</div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="mainContentContainer"></div>
+
+  <!-- Bottom Fixed Ad -->
+  <div id="bottomAdBox"></div>
+
+  <!-- Share Link Toast -->
+  <div id="toastBox"></div>
+
+  <!-- Video Player Modal -->
+  <div class="player-modal" id="playerModal">
+    <div class="share-modal-btn" onclick="shareModalVideo()" title="Share Video"><i class="fa-solid fa-share-nodes"></i></div>
+    <div class="close-modal" onclick="closePlayer()"><i class="fa-solid fa-xmark"></i></div>
+    <div class="video-box-wrapper" id="videoPlayerContainer"></div>
+    <div class="modal-title" id="modalTitle"></div>
+  </div>
+
+  <!-- Lock / Green Timer Modal -->
+  <div class="player-modal" id="lockModal">
+    <div class="close-modal" id="lockModalCloseBtn" onclick="closeLockModal()"><i class="fa-solid fa-xmark"></i></div>
+    <div class="lock-box" id="lockBoxContent"></div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <div class="nav-link active" onclick="switchTab('home', this)">
+      <i class="fa-solid fa-house"></i><span>Home</span>
+    </div>
+    <div class="nav-link" onclick="switchTab('trending', this)">
+      <i class="fa-solid fa-crown"></i><span>Premium</span>
+    </div>
+    <div class="nav-link" onclick="switchTab('mylist', this)">
+      <i class="fa-solid fa-bookmark"></i><span>My List</span>
+    </div>
+    <div class="nav-link" onclick="switchTab('profile', this)">
+      <i class="fa-solid fa-user" id="navProfileIcon"></i><span>Profile</span>
+    </div>
+  </div>
+   <!-- ===== ভাসমান কন্টাক্ট বাটন শুরু ===== -->
+<div class="fab-container" id="fabContainer">
+  <div class="fab-options" id="fabOptions">
+    <a href="https://t.me/premiume2026" target="_blank" rel="noopener" class="fab-option telegram-personal" aria-label="Telegram" title="Telegram"><i class="fa-brands fa-telegram"></i><span>Telegram</span></a>
+    <a href="https://t.me/vairalvideo226" target="_blank" rel="noopener" class="fab-option telegram-channel" aria-label="Telegram Channel" title="Telegram Channel"><i class="fa-solid fa-users"></i><span>Telegram Channel</span></a>
+    <a href="https://wa.me/8801749799622" target="_blank" rel="noopener" class="fab-option whatsapp" aria-label="WhatsApp" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i><span>WhatsApp</span></a>
+  </div>
+  <button class="fab-main" id="fabMain" aria-label="যোগাযোগের অপশন খুলুন"><i class="fa-solid fa-headset"></i></button>
+</div>
+<script>
+  (function () {
+    var fabMain = document.getElementById('fabMain');
+    var fabOptions = document.getElementById('fabOptions');
+    fabMain.addEventListener('click', function (e) {
+      e.stopPropagation();
+      fabOptions.classList.toggle('show');
+      fabMain.classList.toggle('active');
+    });
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.fab-container')) {
+        fabOptions.classList.remove('show');
+        fabMain.classList.remove('active');
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>
